@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SmachApp</string>
+    <string name="new_fsm">Neu</string>
+    <string name="load_fsm">Laden</string>
+
+</resources>
