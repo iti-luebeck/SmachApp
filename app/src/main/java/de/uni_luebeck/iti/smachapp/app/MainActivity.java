@@ -1,6 +1,7 @@
 package de.uni_luebeck.iti.smachapp.app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -14,7 +15,8 @@ public class MainActivity extends Activity {
 
 
     public void newFSM(View view){
-
+        Intent i=new Intent(this, StateMachineEditor.class);
+        startActivity(i);
     }
 
 }

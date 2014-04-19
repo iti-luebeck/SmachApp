@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="de.uni_luebeck.iti.smachapp.app.StateMachineEditor"
+            android:label="@string/title_activity_state_machine_editor" >
+        </activity>
     </application>
 
 </manifest>

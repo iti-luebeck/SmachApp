@@ -4,5 +4,6 @@
     <string name="app_name">SmachApp</string>
     <string name="new_fsm">Neu</string>
     <string name="load_fsm">Laden</string>
+    <string name="title_activity_state_machine_editor">StateMachineEditor</string>
 
 </resources>
