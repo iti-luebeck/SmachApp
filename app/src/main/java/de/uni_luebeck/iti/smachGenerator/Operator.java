@@ -6,7 +6,8 @@ public enum Operator {
     EQUAL("==", "=="),
     NOT_EQUAL("!=", "!="),
     SMALLER_EQUAL("<=", "&lt;="),
-    SMALLER("<", "&lt;");
+    SMALLER("<", "&lt;"),
+    PLACE_HOLDER("","");
 
     private String htmlString;
     private String s;
