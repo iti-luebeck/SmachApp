@@ -1,5 +1,9 @@
 package de.uni_luebeck.iti.smachapp.model;
 
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,18 +15,24 @@ import de.uni_luebeck.iti.smachGenerator.ISmachableState;
  */
 public class State implements ISmachableState {
 
+    private static Rect helperRect=new Rect();
+
     private String name;
     private boolean initialState;
     private LinkedList<Transition> transitions=new LinkedList<Transition>();
     private LinkedList<Action> actions=new LinkedList<Action>();
 
-    public State(String name){
-        this(name,false);
+    private float x,y;
+
+    public State(String name, float x, float y){
+        this(name,x,y,false);
     }
 
-    public State(String name, boolean initialState){
+    public State(String name,float x,float y, boolean initialState){
         this.name=name;
         this.initialState=initialState;
+        this.x=x;
+        this.y=y;
     }
 
     @Override
@@ -74,5 +84,34 @@ public class State implements ISmachableState {
 
     public Iterator<Action> actionIterator(){
         return actions.iterator();
+    }
+
+    public float getX(){
+        return x;
+    }
+
+    public float getY(){
+        return y;
+    }
+
+    public void setX(float x){
+        this.x=x;
+    }
+
+    public void setY(float y){
+        this.y=y;
+    }
+
+    public void getContainingRect(Paint paintToUse,RectF result){
+
+        paintToUse.getTextBounds(name,0,name.length(),helperRect);
+
+        int width=helperRect.width()/2;
+        int height=helperRect.height()/2;
+
+        result.left=x-25-width;
+        result.right=x+25+width;
+        result.top=y-25-height;
+        result.bottom=y+25-height;
     }
 }

@@ -5,5 +5,7 @@
     <string name="new_fsm">Neu</string>
     <string name="load_fsm">Laden</string>
     <string name="title_activity_state_machine_editor">StateMachineEditor</string>
+    <string name="edit_states">Zustände</string>
+    <string name="edit_transitions">Übergänge</string>
 
 </resources>
