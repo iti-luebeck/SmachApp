@@ -15,8 +15,6 @@ import de.uni_luebeck.iti.smachGenerator.ISmachableState;
  */
 public class State implements ISmachableState {
 
-    private static Rect helperRect=new Rect();
-
     private String name;
     private boolean initialState;
     private LinkedList<Transition> transitions=new LinkedList<Transition>();
@@ -102,16 +100,8 @@ public class State implements ISmachableState {
         this.y=y;
     }
 
-    public void getContainingRect(Paint paintToUse,RectF result){
-
-        paintToUse.getTextBounds(name,0,name.length(),helperRect);
-
-        int width=helperRect.width()/2;
-        int height=helperRect.height()/2;
-
-        result.left=x-25-width;
-        result.right=x+25+width;
-        result.top=y-25-height;
-        result.bottom=y+25-height;
+    public void setCenter(float x,float y){
+        this.x=x;
+        this.y=y;
     }
 }

@@ -7,5 +7,6 @@
     <string name="title_activity_state_machine_editor">StateMachineEditor</string>
     <string name="edit_states">Zustände</string>
     <string name="edit_transitions">Übergänge</string>
+    <string name="reset_view">Zentrieren</string>
 
 </resources>
