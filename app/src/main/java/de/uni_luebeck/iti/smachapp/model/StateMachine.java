@@ -43,6 +43,15 @@ public class StateMachine implements Iterable<State> {
         if(s.isInitialState()){
             throw new IllegalArgumentException("You can not remove the initial State.");
         }
+        for(State curr:this){
+            Iterator<Transition> iter=curr.iterator();
+
+            while(iter.hasNext()){
+                if(iter.next().getFollowerState()==s){
+                    iter.remove();
+                }
+            }
+        }
         states.remove(s);
     }
 

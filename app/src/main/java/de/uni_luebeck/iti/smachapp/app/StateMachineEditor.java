@@ -33,7 +33,7 @@ public class StateMachineEditor extends Activity {
             model=new EditorModel();
             oldModel=null;
 
-            State state=new State(model.getNextName(),0,0,true);
+            State state=new State(model.getNextStateName(),0,0,true);
             model.getStateMachine().addState(state);
         }
 

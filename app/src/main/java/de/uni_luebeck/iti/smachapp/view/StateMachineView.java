@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -13,6 +14,7 @@ import android.view.View;
 
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
+import de.uni_luebeck.iti.smachapp.model.Transition;
 
 /**
  * Created by Morten Mey on 27.04.2014.
@@ -37,6 +39,11 @@ public class StateMachineView extends View {
 
     private RectF rect = new RectF();
     private Rect clipBounds=new Rect();
+
+    private Path path=new Path();
+    private Path tempPath;
+
+    private Transition highlightedTransition=null;
 
     private State highlightedState=null;
 
@@ -93,6 +100,20 @@ public class StateMachineView extends View {
         for (State state : model.getStateMachine()) {
            Paint oval,text;
 
+            for(Transition trans:state){
+                if(trans==highlightedTransition){
+                    oval=highlightePaint;
+                    text=highlighteTextPaint;
+                }else{
+                    oval=paint;
+                    text=textPaint;
+                }
+
+                path.reset();
+                trans.getPath().fillPath(path);
+                canvas.drawPath(path,oval);
+            }
+
             if(state==highlightedState){
                 oval=highlightePaint;
                 text=highlighteTextPaint;
@@ -111,6 +132,10 @@ public class StateMachineView extends View {
                 rect.bottom += initialStateOffset;
                 canvas.drawOval(rect, oval);
             }
+        }
+
+        if(tempPath!=null) {
+            canvas.drawPath(tempPath, highlightePaint);
         }
     }
 
@@ -176,5 +201,15 @@ public class StateMachineView extends View {
     public void highlighteState(State s){
         highlightedState=s;
         postInvalidate();
+    }
+
+    public void highlighteTransition(Transition trans){
+        highlightedTransition=trans;
+        postInvalidate();;
+    }
+
+    public void setTempPath(Path p){
+        tempPath=p;
+        postInvalidate();;
     }
 }

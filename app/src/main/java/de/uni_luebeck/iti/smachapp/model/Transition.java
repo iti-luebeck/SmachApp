@@ -12,11 +12,13 @@ public class Transition implements ISmachableTransition {
     private State next;
     private String name;
     private Guard guard=new Guard();
+    private BezierPath path;
 
-    public Transition(State from,State to,String name){
+    public Transition(State from,State to,String name,BezierPath path){
         previous=from;
         next=to;
         this.name=name;
+        this.path=path;
     }
 
     public State getPreviousState(){
@@ -44,6 +46,10 @@ public class Transition implements ISmachableTransition {
 
     public String getName(){
         return name;
+    }
+
+    public BezierPath getPath(){
+        return path;
     }
 
 

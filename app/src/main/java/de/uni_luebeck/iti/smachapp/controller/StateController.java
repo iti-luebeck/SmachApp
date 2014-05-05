@@ -72,7 +72,7 @@ public class StateController implements ExtendedGestureListener{
         point.x=motionEvent.getX();
         point.y=motionEvent.getY();
         cont.getView().translatePoint(point);
-        State s=new State(cont.getModel().getNextName(),point.x,point.y);
+        State s=new State(cont.getModel().getNextStateName(),point.x,point.y);
         cont.getModel().getStateMachine().addState(s);
         cont.getView().postInvalidate();
 

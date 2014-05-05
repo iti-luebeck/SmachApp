@@ -15,6 +15,7 @@ public class EditorModel {
     private StateMachine stateMachine=new StateMachine();
 
     private int stateNameCounter=0;
+    private int transitionNameCounter=0;
 
     public void setCurrentState(EditorState newState){
         currentState=newState;
@@ -32,9 +33,19 @@ public class EditorModel {
         stateNameCounter=i;
     }
 
-    public String getNextName(){
+    public String getNextStateName(){
         String res="S"+stateNameCounter;
         stateNameCounter++;
+        return res;
+    }
+
+    public void setTransitionNameCounter(int i){
+        transitionNameCounter=i;
+    }
+
+    public String getNextTransitionName(){
+        String res="T"+transitionNameCounter;
+        transitionNameCounter++;
         return res;
     }
 }

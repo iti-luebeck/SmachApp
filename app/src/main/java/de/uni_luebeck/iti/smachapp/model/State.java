@@ -13,7 +13,7 @@ import de.uni_luebeck.iti.smachGenerator.ISmachableState;
 /**
  * Created by Morten Mey on 21.04.2014.
  */
-public class State implements ISmachableState {
+public class State implements ISmachableState,Iterable<Transition> {
 
     private String name;
     private boolean initialState;
@@ -103,5 +103,10 @@ public class State implements ISmachableState {
     public void setCenter(float x,float y){
         this.x=x;
         this.y=y;
+    }
+
+    @Override
+    public Iterator<Transition> iterator() {
+        return transitions.iterator();
     }
 }
