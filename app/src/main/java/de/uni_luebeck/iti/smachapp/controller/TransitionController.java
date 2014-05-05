@@ -1,7 +1,10 @@
 package de.uni_luebeck.iti.smachapp.controller;
 
-import android.view.GestureDetector;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
+
+import de.uni_luebeck.iti.smachapp.app.R;
 
 /**
  * Created by Morten Mey on 28.04.2014.
@@ -46,6 +49,11 @@ public class TransitionController implements ExtendedGestureListener{
 
     @Override
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float v, float v2) {
+        return false;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
         return false;
     }
 

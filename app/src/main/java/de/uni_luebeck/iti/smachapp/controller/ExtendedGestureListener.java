@@ -1,6 +1,7 @@
 package de.uni_luebeck.iti.smachapp.controller;
 
 import android.view.GestureDetector;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 
 /**
@@ -9,4 +10,6 @@ import android.view.MotionEvent;
 public interface ExtendedGestureListener extends GestureDetector.OnGestureListener {
 
     public void onUp(MotionEvent e);
+
+    boolean onContextItemSelected(MenuItem item);
 }

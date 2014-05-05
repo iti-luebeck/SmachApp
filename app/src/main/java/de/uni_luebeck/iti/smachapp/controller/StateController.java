@@ -2,9 +2,12 @@ package de.uni_luebeck.iti.smachapp.controller;
 
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.view.GestureDetector;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
+import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.State;
 
 /**
@@ -12,10 +15,19 @@ import de.uni_luebeck.iti.smachapp.model.State;
  */
 public class StateController implements ExtendedGestureListener{
 
+    public class MenuInfo implements ContextMenu.ContextMenuInfo{
+        public State selectedState;
+
+        private MenuInfo(State s){
+            selectedState=s;
+        }
+    }
+
     private StateMachineEditorController cont;
     private State dragged=null;
     private RectF rect=new RectF();
     private PointF point=new PointF();
+    private boolean isLongPress=false;
 
     public StateController(StateMachineEditorController cont){
         this.cont=cont;
@@ -39,12 +51,16 @@ public class StateController implements ExtendedGestureListener{
 
     @Override
     public void onUp(MotionEvent e) {
-
+        if(!isLongPress) {
+            dragged = null;
+            cont.getView().highlighteState(null);
+        }
+        isLongPress=false;
     }
 
     @Override
     public void onShowPress(MotionEvent motionEvent) {
-
+        cont.getView().highlighteState(dragged);
     }
 
     @Override
@@ -79,11 +95,37 @@ public class StateController implements ExtendedGestureListener{
 
     @Override
     public void onLongPress(MotionEvent motionEvent) {
-
+        if(dragged!=null) {
+            cont.showContextMenu();
+            isLongPress = true;
+        }
     }
 
     @Override
     public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float v, float v2) {
         return false;
+    }
+
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.context_menu_delete:
+                if(dragged.isInitialState()){
+                    Toast toast= Toast.makeText(cont.getView().getContext(),R.string.cant_delete_initial_state,Toast.LENGTH_LONG);
+                    toast.show();
+                }else {
+                    cont.getModel().getStateMachine().removeState(dragged);
+                }
+                dragged=null;
+                cont.getView().highlighteState(null);
+                return true;
+
+            case R.id.context_menu_properties:
+                return true;
+
+            default:
+                return false;
+        }
     }
 }

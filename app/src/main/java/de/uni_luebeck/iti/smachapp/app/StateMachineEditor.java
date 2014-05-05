@@ -3,6 +3,9 @@ package de.uni_luebeck.iti.smachapp.app;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
 import de.uni_luebeck.iti.smachapp.controller.StateMachineEditorController;
@@ -36,7 +39,10 @@ public class StateMachineEditor extends Activity {
 
         setContentView(R.layout.activity_state_machine_editor);
 
-        controller=new StateMachineEditorController(model,(StateMachineView)findViewById(R.id.editorView));
+        StateMachineView view=(StateMachineView)findViewById(R.id.editorView);
+        registerForContextMenu(view);
+
+        controller=new StateMachineEditorController(model,view,this);
     }
 
     @Override
@@ -67,5 +73,17 @@ public class StateMachineEditor extends Activity {
 
     public void resetView(View view){
         controller.resetView();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu,v,menuInfo);
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.context_menu,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        return controller.onContextItemSelected(item);
     }
 }

@@ -2,17 +2,15 @@ package de.uni_luebeck.iti.smachapp.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 
-import de.uni_luebeck.iti.smachapp.controller.ITouchController;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
 
@@ -34,11 +32,13 @@ public class StateMachineView extends View {
 
     private Paint paint;
     private Paint textPaint;
+    private Paint highlightePaint;
+    private Paint highlighteTextPaint;
 
     private RectF rect = new RectF();
     private Rect clipBounds=new Rect();
 
-    private ITouchController controller = null;
+    private State highlightedState=null;
 
     public StateMachineView(Context context) {
         super(context);
@@ -60,22 +60,20 @@ public class StateMachineView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
 
+        highlightePaint=new Paint(paint);
+        highlightePaint.setColor(Color.BLUE);
+
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setTextSize(40);
         textPaint.setTypeface(Typeface.DEFAULT);
+
+        highlighteTextPaint=new Paint(textPaint);
+        highlighteTextPaint.setColor(Color.BLUE);
     }
 
     public void setModel(EditorModel model) {
         this.model = model;
-    }
-
-    public void setController(ITouchController cont) {
-        controller = cont;
-    }
-
-    public ITouchController getController() {
-        return controller;
     }
 
     @Override
@@ -93,26 +91,26 @@ public class StateMachineView extends View {
             return;
         }
         for (State state : model.getStateMachine()) {
+           Paint oval,text;
+
+            if(state==highlightedState){
+                oval=highlightePaint;
+                text=highlighteTextPaint;
+            }else{
+                oval=paint;
+                text=textPaint;
+            }
             getStateRect(state, rect);
-            canvas.drawOval(rect, paint);
-            canvas.drawText(state.getName(), state.getX(), state.getY(), textPaint);
+            canvas.drawOval(rect, oval);
+            canvas.drawText(state.getName(), state.getX(), state.getY(), text);
 
             if (state.isInitialState()) {
                 rect.left -= initialStateOffset;
                 rect.right += initialStateOffset;
                 rect.top -= initialStateOffset;
                 rect.bottom += initialStateOffset;
-                canvas.drawOval(rect, paint);
+                canvas.drawOval(rect, oval);
             }
-        }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent e) {
-        if (controller == null) {
-            return false;
-        } else {
-            return controller.onTouchEvent(e);
         }
     }
 
@@ -173,5 +171,10 @@ public class StateMachineView extends View {
     public void translatePoint(PointF point) {
         point.x=point.x/scale+clipBounds.left;
         point.y=point.y/scale+clipBounds.top;
+    }
+
+    public void highlighteState(State s){
+        highlightedState=s;
+        postInvalidate();
     }
 }
