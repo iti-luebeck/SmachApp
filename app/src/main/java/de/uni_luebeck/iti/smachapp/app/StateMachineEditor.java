@@ -49,7 +49,10 @@ public class StateMachineEditor extends Activity {
     protected void onResume(){
         super.onResume();
         ActionBar bar=getActionBar();
-        bar.hide();
+
+        if(bar!=null){
+            bar.hide();
+        }
     }
 
     @Override

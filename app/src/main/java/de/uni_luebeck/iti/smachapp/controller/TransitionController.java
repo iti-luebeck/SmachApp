@@ -3,7 +3,6 @@ package de.uni_luebeck.iti.smachapp.controller;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.Toast;

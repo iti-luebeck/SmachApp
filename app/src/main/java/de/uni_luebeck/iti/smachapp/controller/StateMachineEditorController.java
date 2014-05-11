@@ -1,7 +1,5 @@
 package de.uni_luebeck.iti.smachapp.controller;
 
-import android.gesture.GestureOverlayView;
-import android.view.ContextMenu;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;

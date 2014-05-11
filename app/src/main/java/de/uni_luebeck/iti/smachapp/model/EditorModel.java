@@ -7,7 +7,7 @@ public class EditorModel {
 
     public enum EditorState{
         EDIT_STATES,
-        EDIT_TRANSITIONS;
+        EDIT_TRANSITIONS
     }
 
     private EditorState currentState=EditorState.EDIT_STATES;

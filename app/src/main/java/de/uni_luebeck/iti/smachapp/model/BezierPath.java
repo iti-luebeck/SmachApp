@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * A class for creating smooth bezier splines.
  * Created by Morten Mey on 05.05.2014.
  */
 public class BezierPath {
@@ -126,7 +127,7 @@ public class BezierPath {
     }
 
 
-    private static final double MIN_DISTANCE=100;
+    public static final double MIN_DISTANCE=100;
     private static final double END_MIN_DISTANCE=50;
 
     public static void filterPoints(List<PointF> points) {
@@ -138,7 +139,6 @@ public class BezierPath {
 
         PointF last=iter.next();//Never remove first point
 
-        int i=0;
         while(iter.hasNext()){
             PointF curr=iter.next();
 
@@ -152,7 +152,6 @@ public class BezierPath {
 
             if(dist<MIN_DISTANCE){
                 iter.remove();
-                i++;
             }else{
                 last=curr;
             }
@@ -170,7 +169,6 @@ public class BezierPath {
 
         if(dist<END_MIN_DISTANCE){
             points.remove(last);
-            i++;
         }
     }
 }

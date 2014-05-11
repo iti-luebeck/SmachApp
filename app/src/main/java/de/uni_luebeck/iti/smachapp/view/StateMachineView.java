@@ -103,10 +103,8 @@ public class StateMachineView extends View {
             for(Transition trans:state){
                 if(trans==highlightedTransition){
                     oval=highlightePaint;
-                    text=highlighteTextPaint;
                 }else{
                     oval=paint;
-                    text=textPaint;
                 }
 
                 path.reset();
@@ -205,11 +203,11 @@ public class StateMachineView extends View {
 
     public void highlighteTransition(Transition trans){
         highlightedTransition=trans;
-        postInvalidate();;
+        postInvalidate();
     }
 
     public void setTempPath(Path p){
         tempPath=p;
-        postInvalidate();;
+        postInvalidate();
     }
 }

@@ -1,9 +1,5 @@
 package de.uni_luebeck.iti.smachapp.model;
 
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.RectF;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;

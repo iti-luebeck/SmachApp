@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * A simple Finite State Machine.
  * Created by Morten Mey on 21.04.2014.
  */
 public class StateMachine implements Iterable<State> {
@@ -53,6 +54,21 @@ public class StateMachine implements Iterable<State> {
             }
         }
         states.remove(s);
+    }
+
+    public List<State> getPreviousStates(State followingState){
+        List<State> res=new LinkedList<State>();
+
+        for(State curr:this){
+            for(Transition trans:curr){
+                if(trans.getFollowerState()==followingState){
+                    res.add(curr);
+                    break;
+                }
+            }
+        }
+
+        return res;
     }
 
     public void addTransition(Transition t){
