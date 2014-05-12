@@ -128,7 +128,7 @@ public class BezierPath {
 
 
     public static final double MIN_DISTANCE=100;
-    private static final double END_MIN_DISTANCE=50;
+    public static final double RELAXED_MIN_DISTANCE=50;
 
     public static void filterPoints(List<PointF> points) {
         if(points.size()<=2){
@@ -167,7 +167,7 @@ public class BezierPath {
         double y=end.y-last.y;
         double dist=Math.sqrt(x*x+y*y);
 
-        if(dist<END_MIN_DISTANCE){
+        if(dist<RELAXED_MIN_DISTANCE){
             points.remove(last);
         }
     }

@@ -25,7 +25,6 @@ public class StateController implements ExtendedGestureListener{
     private PointF originalPoint=new PointF();
     private PointF lastPoint=new PointF();
     private List<State> incomingTransitions;
-    private double threshold=0;
 
     private RectF rect=new RectF();
     private PointF point=new PointF();
@@ -40,16 +39,18 @@ public class StateController implements ExtendedGestureListener{
     @Override
     public boolean onDown(MotionEvent motionEvent) {
         dragged=null;
+        isLongPress=false;
+
+        point.set(motionEvent.getX(),motionEvent.getY());
+        cont.getView().translatePoint(point);
+
         for(State s:cont.getModel().getStateMachine()){
             cont.getView().getStateRect(s,rect);
-            point.set(motionEvent.getX(),motionEvent.getY());
-            cont.getView().translatePoint(point);
             if(rect.contains(point.x,point.y)){
                 dragged=s;
                 originalPoint.set(dragged.getX(),dragged.getY());
                 lastPoint.set(originalPoint);
                 incomingTransitions=cont.getModel().getStateMachine().getPreviousStates(dragged);
-                threshold=0;
                 break;
             }
         }
@@ -59,10 +60,8 @@ public class StateController implements ExtendedGestureListener{
     @Override
     public void onUp(MotionEvent e) {
         if(!isLongPress) {
-            dragged = null;
             cont.getView().highlighteState(null);
         }
-        isLongPress=false;
     }
 
     @Override
@@ -97,7 +96,7 @@ public class StateController implements ExtendedGestureListener{
 
             temp.x=point.x-originalPoint.x;
             temp.y=point.y-originalPoint.y;
-            threshold=Math.max(temp.length()/ BezierPath.MIN_DISTANCE,threshold);
+            double threshold=temp.length()/ BezierPath.MIN_DISTANCE;
             temp.x=point.x-lastPoint.x;
             temp.y=point.y-lastPoint.y;
             lastPoint.set(point);

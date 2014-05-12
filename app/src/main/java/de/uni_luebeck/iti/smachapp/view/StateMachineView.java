@@ -21,8 +21,9 @@ import de.uni_luebeck.iti.smachapp.model.Transition;
  */
 public class StateMachineView extends View {
 
-    private static final float initialStateOffset = 10f;
-    private static final float stateOvalOffset = 25f;
+    private static final float INITIAL_STATE_OFFSET = 10f;
+    private static final float STATE_OVAL_OFFSET = 25f;
+    private static final float DEBUG_POINT_SIZE=4f;
 
     private static Rect helperRect = new Rect();
 
@@ -36,6 +37,7 @@ public class StateMachineView extends View {
     private Paint textPaint;
     private Paint highlightePaint;
     private Paint highlighteTextPaint;
+    private Paint debugPaint;
 
     private RectF rect = new RectF();
     private Rect clipBounds=new Rect();
@@ -46,6 +48,8 @@ public class StateMachineView extends View {
     private Transition highlightedTransition=null;
 
     private State highlightedState=null;
+
+    private boolean drawBezierKnots=true;
 
     public StateMachineView(Context context) {
         super(context);
@@ -77,6 +81,9 @@ public class StateMachineView extends View {
 
         highlighteTextPaint=new Paint(textPaint);
         highlighteTextPaint.setColor(Color.BLUE);
+
+        debugPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+        debugPaint.setColor(Color.RED);
     }
 
     public void setModel(EditorModel model) {
@@ -110,6 +117,14 @@ public class StateMachineView extends View {
                 path.reset();
                 trans.getPath().fillPath(path);
                 canvas.drawPath(path,oval);
+
+                if(drawBezierKnots){
+                    for(PointF point:trans.getPath().getPoints()){
+                        makeRectFromPoint(point,rect);
+                        extendRect(rect,DEBUG_POINT_SIZE);
+                        canvas.drawOval(rect,debugPaint);
+                    }
+                }
             }
 
             if(state==highlightedState){
@@ -119,15 +134,12 @@ public class StateMachineView extends View {
                 oval=paint;
                 text=textPaint;
             }
-            getStateRect(state, rect);
+            getStateRect(state, rect,true);
             canvas.drawOval(rect, oval);
             canvas.drawText(state.getName(), state.getX(), state.getY(), text);
 
             if (state.isInitialState()) {
-                rect.left -= initialStateOffset;
-                rect.right += initialStateOffset;
-                rect.top -= initialStateOffset;
-                rect.bottom += initialStateOffset;
+                extendRect(rect, INITIAL_STATE_OFFSET);
                 canvas.drawOval(rect, oval);
             }
         }
@@ -179,16 +191,24 @@ public class StateMachineView extends View {
         postInvalidate();
     }
 
-    public void getStateRect(State state, RectF result) {
+    public void getStateRect(State state,RectF result){
+        this.getStateRect(state,result,false);
+    }
+
+    public void getStateRect(State state, RectF result,boolean forDrawing) {
         textPaint.getTextBounds(state.getName(), 0, state.getName().length(), helperRect);
 
         int width = helperRect.width() / 2;
         int height = helperRect.height() / 2;
 
-        result.left = state.getX() - stateOvalOffset - width;
-        result.right = state.getX() + stateOvalOffset + width;
-        result.top = state.getY() - stateOvalOffset - height;
-        result.bottom = state.getY() + stateOvalOffset - height;
+        result.left = state.getX() - STATE_OVAL_OFFSET - width;
+        result.right = state.getX() + STATE_OVAL_OFFSET + width;
+        result.top = state.getY() - STATE_OVAL_OFFSET - height;
+        result.bottom = state.getY() + STATE_OVAL_OFFSET - height;
+
+        if(!forDrawing && state.isInitialState()){
+            extendRect(result,INITIAL_STATE_OFFSET);
+        }
     }
 
     public void translatePoint(PointF point) {
@@ -209,5 +229,19 @@ public class StateMachineView extends View {
     public void setTempPath(Path p){
         tempPath=p;
         postInvalidate();
+    }
+
+    private void extendRect(RectF rectangle,float margin){
+        rectangle.left -= margin;
+        rectangle.right += margin;
+        rectangle.top -= margin;
+        rectangle.bottom += margin;
+    }
+
+    private void makeRectFromPoint(PointF point,RectF result){
+        result.left=point.x;
+        result.right=point.x;
+        result.top=point.y;
+        result.bottom=point.y;
     }
 }
