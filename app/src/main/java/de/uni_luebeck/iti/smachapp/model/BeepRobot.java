@@ -2,6 +2,7 @@ package de.uni_luebeck.iti.smachapp.model;
 
 import java.io.BufferedReader;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -156,10 +157,10 @@ public class BeepRobot{
 	}
 
 
-	public void transmit() {
+	public void transmit(File f) {
 		SCPClient client = new SCPClient(conn);
 		try {
-			client.put("test.py", "~/Beep/Software/catkin_ws/src/beep_imu");
+			client.put(f.getAbsolutePath(), "~/Beep/Software/catkin_ws/src/beep_imu");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

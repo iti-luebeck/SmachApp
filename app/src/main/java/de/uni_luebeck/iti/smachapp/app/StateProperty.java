@@ -196,7 +196,7 @@ public class StateProperty extends ActionBarActivity implements SeekBar.OnSeekBa
         picker.setColor(color.getColor());
         builder.setView(myView);
 
-        builder.setPositiveButton(R.string.acceptColor,new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.accept,new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 color.setColor(picker.getColor());
@@ -204,7 +204,7 @@ public class StateProperty extends ActionBarActivity implements SeekBar.OnSeekBa
             }
         });
 
-        builder.setNegativeButton(R.string.disrecardColor,new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.disrecard,new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -233,7 +233,7 @@ public class StateProperty extends ActionBarActivity implements SeekBar.OnSeekBa
                 view2.post(new Runnable() {
                     @Override
                     public void run() {
-                        view2.setText(Integer.toString(i-128));
+                        view2.setText(Integer.toString(i - 128));
                     }
                 });
                 break;

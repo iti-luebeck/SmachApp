@@ -28,7 +28,14 @@
     <string name="led8">LED 8</string>
     <string name="stateNameHint">Der Name des Zustands</string>
     <string name="colorDialogTitle">Wähle eine Farbe:</string>
-    <string name="acceptColor">Übernehmen</string>
-    <string name="disrecardColor">Abbrechen</string>
+    <string name="accept">Übernehmen</string>
+    <string name="disrecard">Abbrechen</string>
+    <string name="compileButton">Kompilieren</string>
+    <string name="transmitButton">Ausführen</string>
+    <string name="enterMachineName">Wähle einen Namen:</string>
+    <string name="next">Weiter</string>
+    <string name="enterAddress">Addresse des Roboters:</string>
+    <string name="newMachine">NeuerAutomat</string>
+    <string name="connnectionFailure">Fehler beim herstellen der Verbindung</string>
 
 </resources>

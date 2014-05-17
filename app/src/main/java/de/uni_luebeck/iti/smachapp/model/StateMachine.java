@@ -12,6 +12,11 @@ import java.util.List;
 public class StateMachine implements Iterable<State> {
 
     private LinkedList<State> states=new LinkedList<State>();
+    private String name;
+
+    public StateMachine(String name){
+        this.name=name;
+    }
 
     @Override
     public Iterator<State> iterator(){
@@ -94,5 +99,13 @@ public class StateMachine implements Iterable<State> {
             }
         }
         return trans;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public List<State> getStates(){
+        return states;
     }
 }

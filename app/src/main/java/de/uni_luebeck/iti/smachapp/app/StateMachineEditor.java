@@ -2,12 +2,16 @@ package de.uni_luebeck.iti.smachapp.app;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 import de.uni_luebeck.iti.smachapp.controller.StateMachineEditorController;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
@@ -31,7 +35,7 @@ public class StateMachineEditor extends Activity {
             model=oldModel;
             oldModel=null;
         }else{
-            model=new EditorModel();
+            model=new EditorModel(getIntent().getStringExtra("name"));
             oldModel=null;
 
             State state=new State(model.getNextStateName(),0,0,true);
@@ -95,5 +99,36 @@ public class StateMachineEditor extends Activity {
         Intent intent=new Intent(this,StateProperty.class);
         StateProperty.setupState(s);
         startActivity(intent);
+    }
+
+    public void compile(View view){
+        controller.compile();
+    }
+
+    public void transmit(View view){
+        controller.compile();
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.enterAddress);
+        final EditText text=new EditText(this);
+        text.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(text);
+
+        builder.setPositiveButton(R.string.next,new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                controller.transmit(text.getText().toString());
+            }
+        });
+
+        builder.setNegativeButton(R.string.disrecard,new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        builder.show();
     }
 }

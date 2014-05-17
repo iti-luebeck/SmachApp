@@ -1,12 +1,19 @@
 package de.uni_luebeck.iti.smachapp.controller;
 
+import android.os.Environment;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Toast;
 
+import java.io.File;
+
+import de.uni_luebeck.iti.smachGenerator.SmachAutomat;
+import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.app.StateMachineEditor;
+import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.view.StateMachineView;
@@ -156,5 +163,24 @@ public class StateMachineEditorController implements View.OnTouchListener,ScaleG
 
     public void showStateProperties(State s){
         activity.showStateProperties(s);
+    }
+
+    public void compile(){
+        SmachAutomat automat=new SmachAutomat(model.getStateMachine().getStates(),model.getRobot().getSensors(),model.getRobot().getActuators());
+        automat.saveToFile(model.getPythonFile());
+    }
+
+    public void transmit(String address){
+        BeepRobot robot=model.getRobot();
+
+        try {
+
+            robot.connect(address);
+            robot.transmit(model.getPythonFile());
+            robot.play();
+        }catch (Exception ex){
+            Toast toast= Toast.makeText(activity, R.string.connnectionFailure,Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 }

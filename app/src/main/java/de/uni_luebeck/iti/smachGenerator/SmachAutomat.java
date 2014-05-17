@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -15,7 +16,7 @@ import java.util.NoSuchElementException;
  */
 public class SmachAutomat {
 
-    private ArrayList<? extends ISmachableState> states = new ArrayList<ISmachableState>();
+    private List<? extends ISmachableState> states;
     private LinkedList<String> smachStates = new LinkedList<String>();
     private int initialStateIndex;
     private SmachableSensors sensors;
@@ -28,7 +29,7 @@ public class SmachAutomat {
      * @throws NoSuchElementException if sensors are used that are not specified in the
      *                                {@link SmachableSensors} object.
      */
-    public SmachAutomat(ArrayList<? extends ISmachableState> states,
+    public SmachAutomat(List<? extends ISmachableState> states,
                         SmachableSensors sensors, SmachableActuators actuators)
             throws NoSuchElementException {
         this.states = states;
