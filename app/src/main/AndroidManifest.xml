@@ -20,6 +20,11 @@
             android:name="de.uni_luebeck.iti.smachapp.app.StateMachineEditor"
             android:label="@string/title_activity_state_machine_editor" >
         </activity>
+        <activity
+            android:name="de.uni_luebeck.iti.smachapp.app.StateProperty"
+            android:label="@string/title_activity_state_property"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
     </application>
 
 </manifest>

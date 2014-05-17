@@ -17,6 +17,8 @@ public class EditorModel {
     private int stateNameCounter=0;
     private int transitionNameCounter=0;
 
+    private BeepRobot robot=new BeepRobot();
+
     public void setCurrentState(EditorState newState){
         currentState=newState;
     }
@@ -47,5 +49,9 @@ public class EditorModel {
         String res="T"+transitionNameCounter;
         transitionNameCounter++;
         return res;
+    }
+
+    public BeepRobot getRobot(){
+        return robot;
     }
 }

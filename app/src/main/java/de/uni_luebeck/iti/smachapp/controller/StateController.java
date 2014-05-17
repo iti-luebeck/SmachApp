@@ -72,7 +72,8 @@ public class StateController implements ExtendedGestureListener{
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
         if(dragged!=null){
-            return false;
+            cont.showStateProperties(dragged);
+            return true;
         }
 
         point.x=motionEvent.getX();
@@ -163,6 +164,8 @@ public class StateController implements ExtendedGestureListener{
                 return true;
 
             case R.id.context_menu_properties:
+                cont.showStateProperties(dragged);
+                cont.getView().highlighteState(null);
                 return true;
 
             default:

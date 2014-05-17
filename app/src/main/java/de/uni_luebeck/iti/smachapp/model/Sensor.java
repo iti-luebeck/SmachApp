@@ -14,7 +14,7 @@ public class Sensor implements ISmachableSensor {
     private String topicType;
     private String topicPackage;
 
-    public Sensor(String topic,String key,String objectInMessage,String topicType,String topicPackage){
+    public Sensor(String key,String topic,String topicType,String topicPackage,String objectInMessage){
         this.topic=topic;
         this.key=key;
         this.objectInMessage=objectInMessage;

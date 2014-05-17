@@ -2,6 +2,7 @@ package de.uni_luebeck.iti.smachapp.app;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -49,7 +50,7 @@ public class StateMachineEditor extends Activity {
     protected void onResume(){
         super.onResume();
         ActionBar bar=getActionBar();
-
+        findViewById(R.id.editorView).postInvalidate();
         if(bar!=null){
             bar.hide();
         }
@@ -88,5 +89,11 @@ public class StateMachineEditor extends Activity {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         return controller.onContextItemSelected(item);
+    }
+
+    public void showStateProperties(State s){
+        Intent intent=new Intent(this,StateProperty.class);
+        StateProperty.setupState(s);
+        startActivity(intent);
     }
 }

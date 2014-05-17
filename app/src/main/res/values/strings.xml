@@ -12,5 +12,23 @@
     <string name="properties">Eigenschaften</string>
     <string name="cant_delete_initial_state">Der initiale Zustand kann nicht gelöscht werden.</string>
     <string name="must_end_at_state">Die Transition muss bei einem Zustand aufhören.</string>
+    <string name="title_activity_state_property">Zustandseigenschaften</string>
+    <string name="motorLName">Motor L</string>
+    <string name="motorRName">Motor R</string>
+    <string name="state">Zustand: </string>
+    <string name="led0">LED 0</string>
+    <string name="colorButton">Farbe</string>
+    <string name="led1">LED 1</string>
+    <string name="led2">LED 2</string>
+    <string name="led3">LED 3</string>
+    <string name="led4">LED 4</string>
+    <string name="led5">LED 5</string>
+    <string name="led6">LED 6</string>
+    <string name="led7">LED 7</string>
+    <string name="led8">LED 8</string>
+    <string name="stateNameHint">Der Name des Zustands</string>
+    <string name="colorDialogTitle">Wähle eine Farbe:</string>
+    <string name="acceptColor">Übernehmen</string>
+    <string name="disrecardColor">Abbrechen</string>
 
 </resources>
