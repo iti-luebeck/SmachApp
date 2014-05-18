@@ -105,7 +105,7 @@ public class StateMachineEditor extends Activity {
 
     public void showStateProperties(State s){
         Intent intent=new Intent(this,StateProperty.class);
-        StateProperty.setupState(s);
+        StateProperty.setupState(s, controller.getModel().getRobot());
         startActivity(intent);
     }
 
