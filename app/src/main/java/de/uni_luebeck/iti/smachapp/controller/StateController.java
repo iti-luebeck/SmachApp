@@ -151,6 +151,8 @@ public class StateController implements ExtendedGestureListener{
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        cont.getView().highlighteState(null);
+
         switch(item.getItemId()){
             case R.id.context_menu_delete:
                 if(dragged.isInitialState()){
@@ -159,13 +161,21 @@ public class StateController implements ExtendedGestureListener{
                 }else {
                     cont.getModel().getStateMachine().removeState(dragged);
                 }
-                dragged=null;
-                cont.getView().highlighteState(null);
+
                 return true;
 
             case R.id.context_menu_properties:
                 cont.showStateProperties(dragged);
-                cont.getView().highlighteState(null);
+                return true;
+
+            case R.id.context_menu_make_initial:
+                for(State x:cont.getModel().getStateMachine()){
+                    if(x.isInitialState()){
+                        x.setInitialState(false);
+                    }
+                }
+
+                dragged.setInitialState(true);
                 return true;
 
             default:

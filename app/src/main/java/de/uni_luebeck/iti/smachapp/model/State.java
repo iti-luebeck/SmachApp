@@ -105,4 +105,8 @@ public class State implements ISmachableState,Iterable<Transition> {
     public Iterator<Transition> iterator() {
         return transitions.iterator();
     }
+
+    public void setInitialState(boolean init){
+        initialState=init;
+    }
 }

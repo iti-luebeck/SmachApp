@@ -87,7 +87,15 @@ public class StateMachineEditor extends Activity {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu,v,menuInfo);
         MenuInflater inflater=getMenuInflater();
-        inflater.inflate(R.menu.context_menu,menu);
+        switch(controller.getModel().getCurrentState()){
+
+            case EDIT_STATES:
+                inflater.inflate(R.menu.context_menu_state,menu);
+                break;
+            case EDIT_TRANSITIONS:
+                inflater.inflate(R.menu.context_menu_trans,menu);
+                break;
+        }
     }
 
     @Override

@@ -178,6 +178,7 @@ public class StateMachineEditorController implements View.OnTouchListener,ScaleG
             robot.connect(address);
             robot.transmit(model.getPythonFile());
             robot.play();
+            robot.disconnect();
         }catch (Exception ex){
             Toast toast= Toast.makeText(activity, R.string.connnectionFailure,Toast.LENGTH_LONG);
             toast.show();

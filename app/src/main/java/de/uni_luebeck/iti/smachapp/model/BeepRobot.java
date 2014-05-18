@@ -27,7 +27,8 @@ public class BeepRobot{
 
 	//List<BeepColorSensor> sensorsCol = new ArrayList<BeepColorSensor>();
 
-	List<Actuator> actuators = new ArrayList<Actuator>();
+	List<IntActuator> intActuators = new ArrayList<IntActuator>();
+    List<ColorActuator> colorActuators=new ArrayList<ColorActuator>();
 
 	Connection conn;
 	Session sess;
@@ -68,31 +69,42 @@ public class BeepRobot{
 		// "beep.msg", "links"));
 		// actuators.add(new BeepActuator("MOTOR2", "topic/motors", "Motors",
 		// "beep.msg", "rechts"));
-        actuators.add(new Actuator("MOTOR_R","motor_r","Int8","std_msgs.msg","data"));
-        actuators.add(new Actuator("MOTOR_L","motor_l","Int8","std_msgs.msg","data"));
+        intActuators.add(new IntActuator("MOTOR_L","motor_l","Int8","std_msgs.msg","data",-128,127));
+        intActuators.add(new IntActuator("MOTOR_R","motor_r","Int8","std_msgs.msg","data",-128,127));
 
-		actuators.add(new Actuator("LED1", "topic/LED1", "Int8",
+        colorActuators.add(new ColorActuator("LED0", "topic/LED0", "Int8",
+                "std_msgs.msg", "data"));
+		colorActuators.add(new ColorActuator("LED1", "topic/LED1", "Int8",
 				"std_msgs.msg", "data"));
-		actuators.add(new Actuator("LED2", "topic/LED2", "Int8",
+        colorActuators.add(new ColorActuator("LED2", "topic/LED2", "Int8",
 				"std_msgs.msg", "data"));
-		actuators.add(new Actuator("LED3", "topic/LED3", "Int8",
+        colorActuators.add(new ColorActuator("LED3", "topic/LED3", "Int8",
 				"std_msgs.msg", "data"));
-		actuators.add(new Actuator("LED4", "topic/LED4", "Int8",
+        colorActuators.add(new ColorActuator("LED4", "topic/LED4", "Int8",
 				"std_msgs.msg", "data"));
-		actuators.add(new Actuator("LED5", "topic/LED5", "Int8",
+        colorActuators.add(new ColorActuator("LED5", "topic/LED5", "Int8",
 				"std_msgs.msg", "data"));
-		actuators.add(new Actuator("LED6", "topic/LED6", "Int8",
+        colorActuators.add(new ColorActuator("LED6", "topic/LED6", "Int8",
 				"std_msgs.msg", "data"));
-		actuators.add(new Actuator("LED7", "topic/LED7", "Int8",
+        colorActuators.add(new ColorActuator("LED7", "topic/LED7", "Int8",
 				"std_msgs.msg", "data"));
-		actuators.add(new Actuator("LED0", "topic/LED0", "Int8",
+        colorActuators.add(new ColorActuator("LED8", "topic/LED8", "Int8",
 				"std_msgs.msg", "data"));
-		actuators.add(new Actuator("LED8", "topic/LED8", "Int8",
-				"std_msgs.msg", "data"));
-		Actuator beep = new Actuator("BEEP", "topic/beep", "Int8",
+		/*
+        Actuator beep = new Actuator("BEEP", "topic/beep", "Int8",
 				"std_msgs.msg", "data");
 		actuators.add(beep);
+
+	    */
 	}
+
+    public List<IntActuator> getIntActuators(){
+        return intActuators;
+    }
+
+    public List<ColorActuator> getColorActuators(){
+        return colorActuators;
+    }
 
 	public SmachableSensors getSensors() {
 		SmachableSensors sen = new SmachableSensors();
@@ -103,7 +115,8 @@ public class BeepRobot{
 
 	public SmachableActuators getActuators() {
 		SmachableActuators act = new SmachableActuators();
-		act.addAll(actuators);
+		act.addAll(intActuators);
+        act.addAll(colorActuators);
 		return act;
 	}
 
