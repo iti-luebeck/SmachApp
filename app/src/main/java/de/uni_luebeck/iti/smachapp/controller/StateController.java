@@ -9,9 +9,9 @@ import android.widget.Toast;
 import java.util.List;
 
 import de.uni_luebeck.iti.smachapp.app.R;
-import de.uni_luebeck.iti.smachapp.model.BezierPath;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
+import de.uni_luebeck.iti.smachapp.utils.PointUtils;
 
 /**
  * A controller for handling input, when the user is in state editing mode.
@@ -24,13 +24,12 @@ public class StateController implements ExtendedGestureListener{
     private State dragged=null;
     private PointF originalPoint=new PointF();
     private PointF lastPoint=new PointF();
-    private List<State> incomingTransitions;
+    private List<Transition> incomingTransitions;
 
     private RectF rect=new RectF();
     private PointF point=new PointF();
-    private PointF temp=new PointF();
 
-    private boolean isLongPress=false;
+    private boolean upHandled =false;
 
     public StateController(StateMachineEditorController cont){
         this.cont=cont;
@@ -39,7 +38,7 @@ public class StateController implements ExtendedGestureListener{
     @Override
     public boolean onDown(MotionEvent motionEvent) {
         dragged=null;
-        isLongPress=false;
+        upHandled =false;
 
         point.set(motionEvent.getX(),motionEvent.getY());
         cont.getView().translatePoint(point);
@@ -50,7 +49,7 @@ public class StateController implements ExtendedGestureListener{
                 dragged=s;
                 originalPoint.set(dragged.getX(),dragged.getY());
                 lastPoint.set(originalPoint);
-                incomingTransitions=cont.getModel().getStateMachine().getPreviousStates(dragged);
+                incomingTransitions=cont.getModel().getStateMachine().getIncomingTransitions(dragged);
                 break;
             }
         }
@@ -59,8 +58,17 @@ public class StateController implements ExtendedGestureListener{
 
     @Override
     public void onUp(MotionEvent e) {
-        if(!isLongPress) {
+        if(!upHandled) {
             cont.getView().highlighteState(null);
+        }
+
+        if(dragged!=null){
+            for(Transition trans:dragged){
+                trans.getPath().fixEnd();
+            }
+            for(Transition trans:incomingTransitions){
+                trans.getPath().fixBeginning();
+            }
         }
     }
 
@@ -71,6 +79,8 @@ public class StateController implements ExtendedGestureListener{
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
+        upHandled=true;
+
         if(dragged!=null){
             cont.showStateProperties(dragged);
             return true;
@@ -95,37 +105,14 @@ public class StateController implements ExtendedGestureListener{
 
             dragged.setCenter(point.x,point.y);
 
-            temp.x=point.x-originalPoint.x;
-            temp.y=point.y-originalPoint.y;
-            double threshold=temp.length()/ BezierPath.MIN_DISTANCE;
-            temp.x=point.x-lastPoint.x;
-            temp.y=point.y-lastPoint.y;
+            PointF temp= PointUtils.calculateDirection(lastPoint,point);
             lastPoint.set(point);
 
             for(Transition trans:dragged){
-                List<PointF> points=trans.getPath().getPoints();
-                for(int i=0;i<=threshold&&i<points.size()-1;i++){
-                    PointF curr=points.get(i);
-                    curr.x+=temp.x;
-                    curr.y+=temp.y;
-                }
-                trans.getPath().updateCurveControlPoints();
+                trans.getPath().moveKnots(temp.x,temp.y,0);
             }
-
-            for(State prev:incomingTransitions){
-                for(Transition trans:prev){
-                    if(trans.getFollowerState()!=dragged){
-                        continue;
-                    }
-
-                    List<PointF> points=trans.getPath().getPoints();
-                    for(int i=0;i<=threshold&&i<points.size()-1;i++){
-                        PointF curr=points.get(points.size()-1-i);
-                        curr.x+=temp.x;
-                        curr.y+=temp.y;
-                    }
-                    trans.getPath().updateCurveControlPoints();
-                }
+            for(Transition trans:incomingTransitions){
+                trans.getPath().moveKnots(temp.x,temp.y,-1);
             }
 
             cont.getView().postInvalidate();
@@ -139,7 +126,7 @@ public class StateController implements ExtendedGestureListener{
     public void onLongPress(MotionEvent motionEvent) {
         if(dragged!=null) {
             cont.showContextMenu();
-            isLongPress = true;
+            upHandled = true;
         }
     }
 

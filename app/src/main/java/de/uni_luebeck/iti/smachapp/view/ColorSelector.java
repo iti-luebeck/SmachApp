@@ -76,7 +76,6 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
         LayoutInflater factory = LayoutInflater.from(this.getContext());
         View myView = factory.inflate(R.layout.color_picker, null);
         final ColorPicker picker = (ColorPicker) myView.findViewById(R.id.picker);
-        picker.addOpacityBar((OpacityBar)myView.findViewById(R.id.opacitybar));
         picker.addSaturationBar((SaturationBar) myView.findViewById(R.id.saturationbar));
         picker.addValueBar((ValueBar) myView.findViewById(R.id.valuebar));
         picker.setColor(color);

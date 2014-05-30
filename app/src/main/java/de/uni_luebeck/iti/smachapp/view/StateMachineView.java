@@ -12,9 +12,13 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.List;
+
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
+import de.uni_luebeck.iti.smachapp.utils.PointUtils;
+import de.uni_luebeck.iti.smachapp.utils.RectUtils;
 
 /**
  * Created by Morten Mey on 27.04.2014.
@@ -35,9 +39,10 @@ public class StateMachineView extends View {
 
     private Paint paint;
     private Paint textPaint;
-    private Paint highlightePaint;
-    private Paint highlighteTextPaint;
+    private Paint highlightPaint;
+    private Paint highlightTextPaint;
     private Paint debugPaint;
+    private Paint arrowPaint;
 
     private RectF rect = new RectF();
     private Rect clipBounds=new Rect();
@@ -51,39 +56,43 @@ public class StateMachineView extends View {
 
     private boolean drawBezierKnots=true;
 
+    private Path arrowHead=new Path();
+
     public StateMachineView(Context context) {
         super(context);
-        createPaint();
+        setup();
     }
 
     public StateMachineView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        createPaint();
+        setup();
     }
 
     public StateMachineView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        createPaint();
+        setup();
     }
 
-    private void createPaint() {
+    private void setup() {
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
 
-        highlightePaint=new Paint(paint);
-        highlightePaint.setColor(Color.BLUE);
+        highlightPaint =new Paint(paint);
+        highlightPaint.setColor(Color.BLUE);
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setTextSize(40);
         textPaint.setTypeface(Typeface.DEFAULT);
 
-        highlighteTextPaint=new Paint(textPaint);
-        highlighteTextPaint.setColor(Color.BLUE);
+        highlightTextPaint =new Paint(textPaint);
+        highlightTextPaint.setColor(Color.BLUE);
 
         debugPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
         debugPaint.setColor(Color.RED);
+
+        arrowPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     public void setModel(EditorModel model) {
@@ -101,6 +110,7 @@ public class StateMachineView extends View {
         canvas.translate(translationX + width, translationY + height);
         canvas.getClipBounds(clipBounds);
 
+
         if (model == null) {
             return;
         }
@@ -109,27 +119,31 @@ public class StateMachineView extends View {
 
             for(Transition trans:state){
                 if(trans==highlightedTransition){
-                    oval=highlightePaint;
+                    oval= highlightPaint;
                 }else{
                     oval=paint;
                 }
 
-                path.reset();
+                path.rewind();
                 trans.getPath().fillPath(path);
                 canvas.drawPath(path,oval);
 
+                List<PointF> points=trans.getPath().getPoints();
+                makeArrowHead(trans.getPath().calculatePointOnBezier(-1,0.95f),points.get(points.size()-1));
+                canvas.drawPath(arrowHead,arrowPaint);
+
                 if(drawBezierKnots){
                     for(PointF point:trans.getPath().getPoints()){
-                        makeRectFromPoint(point,rect);
-                        extendRect(rect,DEBUG_POINT_SIZE);
+                        RectUtils.makeRectFromPoint(point, rect);
+                        RectUtils.extendRect(rect, DEBUG_POINT_SIZE);
                         canvas.drawOval(rect,debugPaint);
                     }
                 }
             }
 
             if(state==highlightedState){
-                oval=highlightePaint;
-                text=highlighteTextPaint;
+                oval= highlightPaint;
+                text= highlightTextPaint;
             }else{
                 oval=paint;
                 text=textPaint;
@@ -139,13 +153,13 @@ public class StateMachineView extends View {
             canvas.drawText(state.getName(), state.getX(), state.getY(), text);
 
             if (state.isInitialState()) {
-                extendRect(rect, INITIAL_STATE_OFFSET);
+                RectUtils.extendRect(rect, INITIAL_STATE_OFFSET);
                 canvas.drawOval(rect, oval);
             }
         }
 
         if(tempPath!=null) {
-            canvas.drawPath(tempPath, highlightePaint);
+            canvas.drawPath(tempPath, highlightPaint);
         }
     }
 
@@ -207,7 +221,7 @@ public class StateMachineView extends View {
         result.bottom = state.getY() + STATE_OVAL_OFFSET - height;
 
         if(!forDrawing && state.isInitialState()){
-            extendRect(result,INITIAL_STATE_OFFSET);
+            RectUtils.extendRect(result, INITIAL_STATE_OFFSET);
         }
     }
 
@@ -231,17 +245,26 @@ public class StateMachineView extends View {
         postInvalidate();
     }
 
-    private void extendRect(RectF rectangle,float margin){
-        rectangle.left -= margin;
-        rectangle.right += margin;
-        rectangle.top -= margin;
-        rectangle.bottom += margin;
-    }
+    private void makeArrowHead(PointF secondPoint, PointF endPoint){
 
-    private void makeRectFromPoint(PointF point,RectF result){
-        result.left=point.x;
-        result.right=point.x;
-        result.top=point.y;
-        result.bottom=point.y;
+        PointF dir= PointUtils.calculateDirection(endPoint, secondPoint);
+        PointUtils.normalize(dir);
+
+        PointF first=new PointF(-dir.y,dir.x);
+        PointF second=new PointF(dir.y,-dir.x);
+        first.x*=10;
+        first.y*=10;
+        second.x*=10;
+        second.y*=10;
+        dir.x*=20;
+        dir.y*=20;
+        dir.x+=endPoint.x;
+        dir.y+=endPoint.y;
+
+        arrowHead.rewind();
+        arrowHead.moveTo(endPoint.x,endPoint.y);
+        arrowHead.lineTo(dir.x+first.x,dir.y+first.y);
+        arrowHead.lineTo(dir.x+second.x,dir.y+second.y);
+        arrowHead.close();
     }
 }

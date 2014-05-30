@@ -61,21 +61,6 @@ public class StateMachine implements Iterable<State> {
         states.remove(s);
     }
 
-    public List<State> getPreviousStates(State followingState){
-        List<State> res=new LinkedList<State>();
-
-        for(State curr:this){
-            for(Transition trans:curr){
-                if(trans.getFollowerState()==followingState){
-                    res.add(curr);
-                    break;
-                }
-            }
-        }
-
-        return res;
-    }
-
     public void addTransition(Transition t){
         State s=t.getPreviousState();
         if(!states.contains(s)||!states.contains(t.getFollowerState())){
@@ -107,5 +92,18 @@ public class StateMachine implements Iterable<State> {
 
     public List<State> getStates(){
         return states;
+    }
+
+    public List<Transition> getIncomingTransitions(State state) {
+        List<Transition> res=new LinkedList<Transition>();
+
+        for(State curr:this){
+            for(Transition trans:curr){
+                if(trans.getFollowerState()==state){
+                    res.add(trans);
+                }
+            }
+        }
+        return res;
     }
 }

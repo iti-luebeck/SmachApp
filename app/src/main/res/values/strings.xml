@@ -36,7 +36,7 @@
     <string name="next">Weiter</string>
     <string name="enterAddress">Addresse des Roboters:</string>
     <string name="newMachine">NeuerAutomat</string>
-    <string name="connnectionFailure">Fehler beim herstellen der Verbindung</string>
+    <string name="connnectionFailure">Fehler beim Herstellen der Verbindung</string>
     <string name="make_state_initial">Zum Startzustand machen</string>
 
 </resources>

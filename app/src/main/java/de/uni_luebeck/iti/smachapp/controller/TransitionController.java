@@ -14,6 +14,7 @@ import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.BezierPath;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
+import de.uni_luebeck.iti.smachapp.utils.PointUtils;
 
 /**
  * Created by Morten Mey on 28.04.2014.
@@ -24,7 +25,6 @@ public class TransitionController implements ExtendedGestureListener{
 
     private RectF rect=new RectF();
     private PointF point=new PointF();
-    private PointF temp=new PointF();
     private Path tempPath=new Path();
     private List<PointF> points=new LinkedList<PointF>();
 
@@ -66,8 +66,7 @@ public class TransitionController implements ExtendedGestureListener{
             List<PointF> transPoints=trans.getPath().getPoints();
             for(int i=1;i<transPoints.size()-1;i++){
                 PointF curr=transPoints.get(i);
-                temp.set(curr.x-point.x,curr.y-point.y);
-                float dist=temp.length();
+                float dist=PointUtils.distance(curr,point);
 
                 if(dist<BezierPath.RELAXED_MIN_DISTANCE){
                     selected=trans;
@@ -78,9 +77,8 @@ public class TransitionController implements ExtendedGestureListener{
 
                     if(i+2<transPoints.size()){
                         PointF nextPoint=transPoints.get(i+1);
-                        temp.set(nextPoint.x-point.x,nextPoint.y-point.y);
 
-                        if(dist>temp.length()){
+                        if(dist>PointUtils.distance(nextPoint,point)){
                             closestPoint=i+1;
                         }
                     }
@@ -98,34 +96,45 @@ public class TransitionController implements ExtendedGestureListener{
 
     @Override
     public void onUp(MotionEvent e) {
+        cont.getView().setTempPath(null);
         if(isLongPress){
             return;
         }
         cont.getView().highlighteTransition(null);
-        if(begin==null){
-            return;
-        }
 
-        State end=null;
-        point.set(e.getX(),e.getY());
-        cont.getView().translatePoint(point);
-        for(State s:cont.getModel().getStateMachine()){
-            cont.getView().getStateRect(s,rect);
-            if(rect.contains(point.x,point.y)){
-                end=s;
-                points.add(new PointF(point.x,point.y));
-                break;
+        if(begin!=null) {
+            State end = null;
+            point.set(e.getX(), e.getY());
+            cont.getView().translatePoint(point);
+            for (State s : cont.getModel().getStateMachine()) {
+                cont.getView().getStateRect(s, rect);
+                if (rect.contains(point.x, point.y)) {
+                    end = s;
+                    points.add(new PointF(point.x, point.y));
+                    break;
+                }
             }
+            if (end == null) {
+                Toast toast = Toast.makeText(cont.getView().getContext(), R.string.must_end_at_state, Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                RectF rect = new RectF();
+                cont.getView().getStateRect(begin, rect);
+                BezierPath.removePointsInOval(rect, points);
+                BezierPath.moveOnOval(rect, points.get(0));
+                cont.getView().getStateRect(end, rect);
+                BezierPath.removePointsInOval(rect, points);
+                BezierPath.moveOnOval(rect, points.get(points.size() - 1));
+
+                BezierPath.filterPoints(points);
+
+                Transition newTrans = new Transition(begin, end, cont.getModel().getNextTransitionName(), new BezierPath(points));
+                cont.getModel().getStateMachine().addTransition(newTrans);
+            }
+        }else if(selected!=null){
+            selected.getPath().fixBeginning();
+            selected.getPath().fixEnd();
         }
-        if(end==null){
-            Toast toast= Toast.makeText(cont.getView().getContext(),R.string.must_end_at_state,Toast.LENGTH_LONG);
-            toast.show();
-        }else{
-            BezierPath.filterPoints(points);
-            Transition newTrans=new Transition(begin,end,cont.getModel().getNextTransitionName(),new BezierPath(points));
-            cont.getModel().getStateMachine().addTransition(newTrans);
-        }
-        cont.getView().setTempPath(null);
     }
 
     @Override
@@ -152,25 +161,10 @@ public class TransitionController implements ExtendedGestureListener{
             return true;
         }else if(selected!=null){
 
-            temp.x=point.x-originalPoint.x;
-            temp.y=point.y-originalPoint.y;
-            double threshold=temp.length()/ BezierPath.MIN_DISTANCE;
-            temp.x=point.x-lastPoint.x;
-            temp.y=point.y-lastPoint.y;
+            PointF temp=PointUtils.calculateDirection(lastPoint, point);
             lastPoint.set(point);
 
-            List<PointF> transPoints=selected.getPath().getPoints();
-
-            int lowerBound=(int)Math.max(1,closestPoint-(int)threshold);
-            int upperBound=(int)Math.min(transPoints.size()-1,closestPoint+(int)threshold+1);
-
-            for(int i=lowerBound;i<upperBound;i++){
-                PointF curr=transPoints.get(i);
-                curr.x+=temp.x;
-                curr.y+=temp.y;
-            }
-
-            selected.getPath().updateCurveControlPoints();
+            selected.getPath().moveKnots(temp.x,temp.y,closestPoint);
             cont.getView().postInvalidate();
 
             return true;
