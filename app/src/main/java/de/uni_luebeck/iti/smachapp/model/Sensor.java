@@ -6,13 +6,13 @@ import de.uni_luebeck.iti.smachGenerator.Operator;
 /**
  * Created by Morten Mey on 21.04.2014.
  */
-public class Sensor implements ISmachableSensor {
+public abstract class Sensor implements ISmachableSensor {
 
-    private String topic;
-    private String key;
-    private String objectInMessage;
-    private String topicType;
-    private String topicPackage;
+    protected String topic;
+    protected String key;
+    protected String objectInMessage;
+    protected String topicType;
+    protected String topicPackage;
 
     public Sensor(String key,String topic,String topicType,String topicPackage,String objectInMessage){
         this.topic=topic;
@@ -45,10 +45,5 @@ public class Sensor implements ISmachableSensor {
     @Override
     public String getTopicPackage() {
         return topicPackage;
-    }
-
-    @Override
-    public String getTransitionCondition(Operator op, int compVal) {
-        return key+op+compVal;
     }
 }

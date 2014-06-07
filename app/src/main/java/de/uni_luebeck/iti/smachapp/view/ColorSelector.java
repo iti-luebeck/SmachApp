@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.larswerkman.holocolorpicker.ColorPicker;
@@ -14,16 +15,22 @@ import com.larswerkman.holocolorpicker.OpacityBar;
 import com.larswerkman.holocolorpicker.SaturationBar;
 import com.larswerkman.holocolorpicker.ValueBar;
 
+import java.util.List;
+
+import de.uni_luebeck.iti.smachGenerator.Operator;
 import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.Action;
 import de.uni_luebeck.iti.smachapp.model.ColorActuator;
+import de.uni_luebeck.iti.smachapp.model.ColorSensor;
+import de.uni_luebeck.iti.smachapp.model.Guard;
 
 /**
  * Created by Morten Mey on 18.05.2014.
  */
-public class ColorSelector extends LinearLayout implements View.OnClickListener,ActuatorUI {
+public class ColorSelector extends LinearLayout implements View.OnClickListener,ActuatorUI,SensorUI {
 
     private ColorActuator actuator;
+    private ColorSensor sensor;
     private CheckBox check;
     private Button button;
 
@@ -32,14 +39,28 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
     public ColorSelector(Context context,ColorActuator actuator) {
         super(context);
         this.actuator=actuator;
+        sensor=null;
 
+        color=actuator.getDefaultColor();
+        setup(context,actuator.getKey());
+    }
+
+    public ColorSelector(Context context,ColorSensor sensor) {
+        super(context);
+        this.sensor=sensor;
+        actuator=null;
+
+        color=sensor.getDefaultColor();
+        setup(context,sensor.getKey());
+    }
+
+    private void setup(Context context,String name){
         check=new CheckBox(context);
-        check.setText(actuator.getKey());
+        check.setText(name);
 
         button=new Button(context);
         button.setText(R.string.colorButton);
-        button.setBackgroundColor(actuator.getDefaultColor());
-        color=actuator.getDefaultColor();
+        button.setBackgroundColor(color);
         button.setOnClickListener(this);
 
         this.addView(check);
@@ -61,6 +82,27 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
     @Override
     public Action createAction(){
         return new Action(actuator.getKey(),color);
+    }
+
+    @Override
+    public void setToGuard(Guard guard){
+
+        List<String> names=guard.getSensorNames();
+        for(int i=0;i<names.size();i++){
+            if(names.get(i).equals(sensor.getKey())) {
+                check.setChecked(true);
+                color=guard.getCompValues().get(i);
+                button.setBackgroundColor(color);
+                button.postInvalidate();
+            }
+        }
+    }
+
+    @Override
+    public void fillGuard(Guard guard){
+        guard.getSensorNames().add(sensor.getKey());
+        guard.getCompValues().add(color);
+        guard.getOperators().add(Operator.PLACE_HOLDER);
     }
 
     @Override

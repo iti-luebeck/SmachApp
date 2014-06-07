@@ -16,6 +16,7 @@ import de.uni_luebeck.iti.smachapp.app.StateMachineEditor;
 import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
+import de.uni_luebeck.iti.smachapp.model.Transition;
 import de.uni_luebeck.iti.smachapp.view.StateMachineView;
 
 /**
@@ -163,6 +164,10 @@ public class StateMachineEditorController implements View.OnTouchListener,ScaleG
 
     public void showStateProperties(State s){
         activity.showStateProperties(s);
+    }
+
+    public void showTransitionProperties(Transition t){
+        activity.showTransitionProperites(t);
     }
 
     public void compile(){

@@ -16,6 +16,7 @@ import android.widget.EditText;
 import de.uni_luebeck.iti.smachapp.controller.StateMachineEditorController;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
+import de.uni_luebeck.iti.smachapp.model.Transition;
 import de.uni_luebeck.iti.smachapp.view.StateMachineView;
 
 public class StateMachineEditor extends Activity {
@@ -109,8 +110,10 @@ public class StateMachineEditor extends Activity {
         startActivity(intent);
     }
 
-    public void compile(View view){
-        controller.compile();
+    public void showTransitionProperites(Transition t) {
+        Intent intent =new Intent(this,TransitionProperty.class);
+        TransitionProperty.setupTransition(t,controller.getModel().getRobot());
+        startActivity(intent);
     }
 
     public void transmit(View view){
@@ -139,4 +142,5 @@ public class StateMachineEditor extends Activity {
 
         builder.show();
     }
+
 }

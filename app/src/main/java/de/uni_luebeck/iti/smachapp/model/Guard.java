@@ -60,4 +60,10 @@ public class Guard implements ISmachableGuard {
         updateOperator(i,op);
         updateValue(i,value);
     }
+
+    public void clear(){
+        names.clear();
+        operators.clear();
+        values.clear();
+    }
 }

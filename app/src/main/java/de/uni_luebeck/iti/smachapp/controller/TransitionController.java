@@ -117,6 +117,9 @@ public class TransitionController implements ExtendedGestureListener{
             if (end == null) {
                 Toast toast = Toast.makeText(cont.getView().getContext(), R.string.must_end_at_state, Toast.LENGTH_LONG);
                 toast.show();
+            }else if(begin==end){
+                Toast toast=Toast.makeText(cont.getView().getContext(),R.string.begin_must_not_be_end,Toast.LENGTH_LONG);
+                toast.show();
             } else {
                 RectF rect = new RectF();
                 cont.getView().getStateRect(begin, rect);
@@ -144,6 +147,10 @@ public class TransitionController implements ExtendedGestureListener{
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
+        if(selected!=null){
+            cont.showTransitionProperties(selected);
+            return true;
+        }
         return false;
     }
 
@@ -195,6 +202,7 @@ public class TransitionController implements ExtendedGestureListener{
                 return true;
 
             case R.id.context_menu_properties:
+                cont.showTransitionProperties(selected);
                 return true;
 
             default:

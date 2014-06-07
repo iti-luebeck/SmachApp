@@ -1,5 +1,7 @@
 package de.uni_luebeck.iti.smachapp.model;
 
+import android.graphics.Color;
+
 import java.io.BufferedReader;
 
 import java.io.File;
@@ -23,9 +25,9 @@ import de.uni_luebeck.iti.smachGenerator.SmachableSensors;
 
 public class BeepRobot{
 
-	List<Sensor> sensorsIR = new ArrayList<Sensor>();
+	List<IntSensor> sensorsIR = new ArrayList<IntSensor>();
 
-	//List<BeepColorSensor> sensorsCol = new ArrayList<BeepColorSensor>();
+	List<ColorSensor> sensorsCol = new ArrayList<ColorSensor>();
 
 	List<IntActuator> intActuators = new ArrayList<IntActuator>();
     List<ColorActuator> colorActuators=new ArrayList<ColorActuator>();
@@ -37,32 +39,31 @@ public class BeepRobot{
 
 	public BeepRobot() {
 		// Define default Beep sensors
-		sensorsIR.add(new Sensor("IR0", "topic/IR0", "Int8",
+		sensorsIR.add(new IntSensor("IR0", "topic/IR0", "Int8",
+				"std_msgs.msg", "data",-128,127));
+		sensorsIR.add(new IntSensor("IR1", "topic/IR1", "Int8",
+				"std_msgs.msg", "data",-128,127));
+		sensorsIR.add(new IntSensor("IR2", "topic/IR2", "Int8",
+				"std_msgs.msg", "data",-128,127));
+		sensorsIR.add(new IntSensor("IR3", "topic/IR3", "Int8",
+				"std_msgs.msg", "data",-128,127));
+		sensorsIR.add(new IntSensor("IR4", "topic/IR4", "Int8",
+				"std_msgs.msg", "data",-128,127));
+		sensorsIR.add(new IntSensor("IR5", "topic/IR5", "Int8",
+				"std_msgs.msg", "data",-128,127));
+		sensorsIR.add(new IntSensor("IR6", "topic/IR6", "Int8",
+				"std_msgs.msg", "data",-128,127));
+		sensorsIR.add(new IntSensor("IR7", "topic/IR7", "Int8",
+				"std_msgs.msg", "data",-128,127));
+
+
+		sensorsCol.add(new ColorSensor("UIR0", "topic/UIR0", "Int8",
 				"std_msgs.msg", "data"));
-		sensorsIR.add(new Sensor("IR1", "topic/IR1", "Int8",
+		sensorsCol.add(new ColorSensor("UIR1", "topic/UIR2", "Int8",
 				"std_msgs.msg", "data"));
-		sensorsIR.add(new Sensor("IR2", "topic/IR2", "Int8",
-				"std_msgs.msg", "data"));
-		sensorsIR.add(new Sensor("IR3", "topic/IR3", "Int8",
-				"std_msgs.msg", "data"));
-		sensorsIR.add(new Sensor("IR4", "topic/IR4", "Int8",
-				"std_msgs.msg", "data"));
-		sensorsIR.add(new Sensor("IR5", "topic/IR5", "Int8",
-				"std_msgs.msg", "data"));
-		sensorsIR.add(new Sensor("IR6", "topic/IR6", "Int8",
-				"std_msgs.msg", "data"));
-		sensorsIR.add(new Sensor("IR7", "topic/IR7", "Int8",
+		sensorsCol.add(new ColorSensor("UIR2", "topic/UIR3", "Int8",
 				"std_msgs.msg", "data"));
 
-        /*
-		sensorsCol.add(new BeepColorSensor("UIR0", "topic/UIR0", "Int8",
-				"std_msgs.msg", "data"));
-		sensorsCol.add(new BeepColorSensor("UIR1", "topic/UIR2", "Int8",
-				"std_msgs.msg", "data"));
-		sensorsCol.add(new BeepColorSensor("UIR2", "topic/UIR3", "Int8",
-				"std_msgs.msg", "data"));
-
-        */
 
 		// Define default Beep actuators
 		// actuators.add(new BeepActuator("MOTOR1", "topic/motors", "Motors",
@@ -106,10 +107,18 @@ public class BeepRobot{
         return colorActuators;
     }
 
+    public List<IntSensor> getIntSensors(){
+        return sensorsIR;
+    }
+
+    public List<ColorSensor> getColorSensors(){
+        return sensorsCol;
+    }
+
 	public SmachableSensors getSensors() {
 		SmachableSensors sen = new SmachableSensors();
 		sen.addAll(sensorsIR);
-		//sen.addAll(sensorsCol);
+		sen.addAll(sensorsCol);
 		return sen;
 	}
 
