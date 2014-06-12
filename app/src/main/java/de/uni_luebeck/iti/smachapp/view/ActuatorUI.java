@@ -9,7 +9,7 @@ public interface ActuatorUI {
 
     public abstract void setToAction(Action action);
 
-    public abstract  Action createAction();
+    public abstract Action createAction();
 
-    public abstract  boolean isChecked();
+    public abstract boolean isChecked();
 }

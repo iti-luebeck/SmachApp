@@ -9,7 +9,7 @@ import de.uni_luebeck.iti.smachGenerator.Operator;
  */
 public class ColorSensor extends Sensor {
 
-    private int defaultColor=Color.RED;
+    private int defaultColor = Color.RED;
 
     public ColorSensor(String key, String topic, String topicType, String topicPackage, String objectInMessage) {
         super(key, topic, topicType, topicPackage, objectInMessage);
@@ -17,7 +17,7 @@ public class ColorSensor extends Sensor {
 
     public ColorSensor(String key, String topic, String topicType, String topicPackage, String objectInMessage, int defaultColor) {
         super(key, topic, topicType, topicPackage, objectInMessage);
-        this.defaultColor=defaultColor;
+        this.defaultColor = defaultColor;
     }
 
     public int getDefaultColor() {

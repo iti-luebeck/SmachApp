@@ -66,7 +66,7 @@ public class TransitionController implements ExtendedGestureListener {
             }
         }
 
-        float minDistance=BezierPath.MIN_DISTANCE;
+        float minDistance = BezierPath.MIN_DISTANCE;
         for (Transition trans : cont.getModel().getStateMachine().getTransitions()) {
             List<PointF> transPoints = trans.getPath().getPoints();
             for (int i = 0; i < transPoints.size() - 1; i++) {
@@ -97,7 +97,7 @@ public class TransitionController implements ExtendedGestureListener {
             }
         }
 
-         return selected!=null;
+        return selected != null;
     }
 
     @Override
@@ -153,19 +153,19 @@ public class TransitionController implements ExtendedGestureListener {
                     PointF p = selected.getPath().getPoints().get(0);
                     if (rect.contains(p.x, p.y)) {
                         connected = true;
-                        if(selected.getPreviousState()!=null) {
+                        if (selected.getPreviousState() != null) {
                             selected.getPreviousState().removeTransition(selected);
                         }
                         selected.setPreviousState(s);
                         s.addTransition(selected);
-                        RectUtils.extendRect(rect,-MARGIN);
+                        RectUtils.extendRect(rect, -MARGIN);
                         BezierPath.moveOnOval(rect, p);
                         break;
                     }
                 }
-                if(!connected){
+                if (!connected) {
                     selected.getPath().getPoints().get(0).set(originalPoint);
-                    Toast toast=Toast.makeText(cont.getView().getContext(),R.string.unconnected_transition,Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(cont.getView().getContext(), R.string.unconnected_transition, Toast.LENGTH_LONG);
                     toast.show();
                 }
 
@@ -177,14 +177,14 @@ public class TransitionController implements ExtendedGestureListener {
                     if (rect.contains(p.x, p.y)) {
                         connected = true;
                         selected.setFollowerState(s);
-                        RectUtils.extendRect(rect,-MARGIN);
+                        RectUtils.extendRect(rect, -MARGIN);
                         BezierPath.moveOnOval(rect, p);
                         break;
                     }
                 }
-                if(!connected){
-                    selected.getPath().getPoints().get(selected.getPath().getPoints().size()-1).set(originalPoint);
-                    Toast toast=Toast.makeText(cont.getView().getContext(),R.string.unconnected_transition,Toast.LENGTH_LONG);
+                if (!connected) {
+                    selected.getPath().getPoints().get(selected.getPath().getPoints().size() - 1).set(originalPoint);
+                    Toast toast = Toast.makeText(cont.getView().getContext(), R.string.unconnected_transition, Toast.LENGTH_LONG);
                     toast.show();
                 }
             }

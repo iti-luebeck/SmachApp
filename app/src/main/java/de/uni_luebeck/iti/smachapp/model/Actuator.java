@@ -13,12 +13,12 @@ public class Actuator implements ISmachableActuator {
     private String topicType;
     private String topicPackage;
 
-    public Actuator(String key,String topic,String topicType,String topicPackage,String objectInMessage){
-        this.topic=topic;
-        this.key=key;
-        this.objectInMessage=objectInMessage;
-        this.topicType=topicType;
-        this.topicPackage=topicPackage;
+    public Actuator(String key, String topic, String topicType, String topicPackage, String objectInMessage) {
+        this.topic = topic;
+        this.key = key;
+        this.objectInMessage = objectInMessage;
+        this.topicType = topicType;
+        this.topicPackage = topicPackage;
     }
 
     @Override

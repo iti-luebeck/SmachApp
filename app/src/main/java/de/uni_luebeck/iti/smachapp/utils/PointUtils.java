@@ -7,17 +7,17 @@ import android.graphics.PointF;
  */
 public class PointUtils {
 
-    public static float distance(PointF a, PointF b){
+    public static float distance(PointF a, PointF b) {
         return calculateDirection(a, b).length();
     }
 
-    public static PointF calculateDirection(PointF from, PointF to){
-        return new PointF(to.x-from.x,to.y-from.y);
+    public static PointF calculateDirection(PointF from, PointF to) {
+        return new PointF(to.x - from.x, to.y - from.y);
     }
 
-    public static void normalize(PointF point){
-        float length=point.length();
-        point.x/=length;
-        point.y/=length;
+    public static void normalize(PointF point) {
+        float length = point.length();
+        point.x /= length;
+        point.y /= length;
     }
 }

@@ -9,24 +9,24 @@ import de.uni_luebeck.iti.smachGenerator.ISmachableState;
 /**
  * Created by Morten Mey on 21.04.2014.
  */
-public class State implements ISmachableState,Iterable<Transition> {
+public class State implements ISmachableState, Iterable<Transition> {
 
     private String name;
     private boolean initialState;
-    private LinkedList<Transition> transitions=new LinkedList<Transition>();
-    private LinkedList<Action> actions=new LinkedList<Action>();
+    private LinkedList<Transition> transitions = new LinkedList<Transition>();
+    private LinkedList<Action> actions = new LinkedList<Action>();
 
-    private float x,y;
+    private float x, y;
 
-    public State(String name, float x, float y){
-        this(name,x,y,false);
+    public State(String name, float x, float y) {
+        this(name, x, y, false);
     }
 
-    public State(String name,float x,float y, boolean initialState){
-        this.name=name;
-        this.initialState=initialState;
-        this.x=x;
-        this.y=y;
+    public State(String name, float x, float y, boolean initialState) {
+        this.name = name;
+        this.initialState = initialState;
+        this.x = x;
+        this.y = y;
     }
 
     @Override
@@ -49,56 +49,56 @@ public class State implements ISmachableState,Iterable<Transition> {
         return name;
     }
 
-    public void setName(String name){
-        this.name=name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void addTransition(Transition t) {
-        if(t.getPreviousState()!=this){
+        if (t.getPreviousState() != this) {
             throw new IllegalArgumentException("This is not the previous state.");
         }
         transitions.add(t);
     }
 
-    public void removeTransition(Transition t){
+    public void removeTransition(Transition t) {
         transitions.remove(t);
     }
 
-    public Iterator<Transition> transitionIterator(){
+    public Iterator<Transition> transitionIterator() {
         return transitions.iterator();
     }
 
-    public void addAction(Action a){
+    public void addAction(Action a) {
         actions.add(a);
     }
 
-    public void removeAction(Action a){
+    public void removeAction(Action a) {
         actions.remove(a);
     }
 
-    public Iterator<Action> actionIterator(){
+    public Iterator<Action> actionIterator() {
         return actions.iterator();
     }
 
-    public float getX(){
+    public float getX() {
         return x;
     }
 
-    public float getY(){
+    public float getY() {
         return y;
     }
 
-    public void setX(float x){
-        this.x=x;
+    public void setX(float x) {
+        this.x = x;
     }
 
-    public void setY(float y){
-        this.y=y;
+    public void setY(float y) {
+        this.y = y;
     }
 
-    public void setCenter(float x,float y){
-        this.x=x;
-        this.y=y;
+    public void setCenter(float x, float y) {
+        this.x = x;
+        this.y = y;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class State implements ISmachableState,Iterable<Transition> {
         return transitions.iterator();
     }
 
-    public void setInitialState(boolean init){
-        initialState=init;
+    public void setInitialState(boolean init) {
+        initialState = init;
     }
 }

@@ -9,7 +9,7 @@ public interface SensorUI {
 
     public abstract void setToGuard(Guard guard);
 
-    public abstract  void fillGuard(Guard guard);
+    public abstract void fillGuard(Guard guard);
 
-    public abstract  boolean isChecked();
+    public abstract boolean isChecked();
 }

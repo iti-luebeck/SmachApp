@@ -23,37 +23,37 @@ public class MainActivity extends Activity {
     }
 
 
-    public void newFSM(View view){
+    public void newFSM(View view) {
 
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle(R.string.enterMachineName);
-        final EditText text=new EditText(this);
+        final EditText text = new EditText(this);
         text.setInputType(InputType.TYPE_CLASS_TEXT);
         text.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         text.setText(R.string.newMachine);
         text.setSelection(text.getText().length());
         builder.setView(text);
 
-        final Activity activity=this;
+        final Activity activity = this;
 
-        builder.setPositiveButton(R.string.next,new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.next, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                Intent intent=new Intent(activity, StateMachineEditor.class);
-                intent.putExtra("name",text.getText().toString());
+                Intent intent = new Intent(activity, StateMachineEditor.class);
+                intent.putExtra("name", text.getText().toString());
                 startActivity(intent);
             }
         });
 
-        builder.setNegativeButton(R.string.disrecard,new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.disrecard, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
             }
         });
 
-        final AlertDialog dia=builder.show();
+        final AlertDialog dia = builder.show();
 
         text.postDelayed(new Runnable() {
             @Override
@@ -68,8 +68,8 @@ public class MainActivity extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 dia.dismiss();
-                Intent intent=new Intent(activity, StateMachineEditor.class);
-                intent.putExtra("name",text.getText().toString());
+                Intent intent = new Intent(activity, StateMachineEditor.class);
+                intent.putExtra("name", text.getText().toString());
                 startActivity(intent);
                 return true;
             }

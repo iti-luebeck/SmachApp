@@ -27,7 +27,7 @@ public class StateMachineView extends View {
 
     private static final float INITIAL_STATE_OFFSET = 10f;
     private static final float STATE_OVAL_OFFSET = 25f;
-    private static final float DEBUG_POINT_SIZE=4f;
+    private static final float DEBUG_POINT_SIZE = 4f;
 
     private static Rect helperRect = new Rect();
 
@@ -45,18 +45,18 @@ public class StateMachineView extends View {
     private Paint arrowPaint;
 
     private RectF rect = new RectF();
-    private Rect clipBounds=new Rect();
+    private Rect clipBounds = new Rect();
 
-    private Path path=new Path();
+    private Path path = new Path();
     private Path tempPath;
 
-    private Transition highlightedTransition=null;
+    private Transition highlightedTransition = null;
 
-    private State highlightedState=null;
+    private State highlightedState = null;
 
-    private boolean drawBezierKnots=true;
+    private boolean drawBezierKnots = true;
 
-    private Path arrowHead=new Path();
+    private Path arrowHead = new Path();
 
     public StateMachineView(Context context) {
         super(context);
@@ -78,7 +78,7 @@ public class StateMachineView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
 
-        highlightPaint =new Paint(paint);
+        highlightPaint = new Paint(paint);
         highlightPaint.setColor(Color.BLUE);
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -86,13 +86,13 @@ public class StateMachineView extends View {
         textPaint.setTextSize(40);
         textPaint.setTypeface(Typeface.DEFAULT);
 
-        highlightTextPaint =new Paint(textPaint);
+        highlightTextPaint = new Paint(textPaint);
         highlightTextPaint.setColor(Color.BLUE);
 
-        debugPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+        debugPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         debugPaint.setColor(Color.RED);
 
-        arrowPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+        arrowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     public void setModel(EditorModel model) {
@@ -115,40 +115,40 @@ public class StateMachineView extends View {
             return;
         }
         for (State state : model.getStateMachine()) {
-           Paint oval,text;
+            Paint oval, text;
 
-            for(Transition trans:state){
-                if(trans==highlightedTransition){
-                    oval= highlightPaint;
-                }else{
-                    oval=paint;
+            for (Transition trans : state) {
+                if (trans == highlightedTransition) {
+                    oval = highlightPaint;
+                } else {
+                    oval = paint;
                 }
 
                 path.rewind();
                 trans.getPath().fillPath(path);
-                canvas.drawPath(path,oval);
+                canvas.drawPath(path, oval);
 
-                List<PointF> points=trans.getPath().getPoints();
-                makeArrowHead(trans.getPath().calculatePointOnBezier(-1,0.95f),points.get(points.size()-1));
-                canvas.drawPath(arrowHead,arrowPaint);
+                List<PointF> points = trans.getPath().getPoints();
+                makeArrowHead(trans.getPath().calculatePointOnBezier(-1, 0.95f), points.get(points.size() - 1));
+                canvas.drawPath(arrowHead, arrowPaint);
 
-                if(drawBezierKnots){
-                    for(PointF point:trans.getPath().getPoints()){
+                if (drawBezierKnots) {
+                    for (PointF point : trans.getPath().getPoints()) {
                         RectUtils.makeRectFromPoint(point, rect);
                         RectUtils.extendRect(rect, DEBUG_POINT_SIZE);
-                        canvas.drawOval(rect,debugPaint);
+                        canvas.drawOval(rect, debugPaint);
                     }
                 }
             }
 
-            if(state==highlightedState){
-                oval= highlightPaint;
-                text= highlightTextPaint;
-            }else{
-                oval=paint;
-                text=textPaint;
+            if (state == highlightedState) {
+                oval = highlightPaint;
+                text = highlightTextPaint;
+            } else {
+                oval = paint;
+                text = textPaint;
             }
-            getStateRect(state, rect,true);
+            getStateRect(state, rect, true);
             canvas.drawOval(rect, oval);
             canvas.drawText(state.getName(), state.getX(), state.getY(), text);
 
@@ -158,7 +158,7 @@ public class StateMachineView extends View {
             }
         }
 
-        if(tempPath!=null) {
+        if (tempPath != null) {
             canvas.drawPath(tempPath, highlightPaint);
         }
     }
@@ -205,11 +205,11 @@ public class StateMachineView extends View {
         postInvalidate();
     }
 
-    public void getStateRect(State state,RectF result){
-        this.getStateRect(state,result,false);
+    public void getStateRect(State state, RectF result) {
+        this.getStateRect(state, result, false);
     }
 
-    public void getStateRect(State state, RectF result,boolean forDrawing) {
+    public void getStateRect(State state, RectF result, boolean forDrawing) {
         textPaint.getTextBounds(state.getName(), 0, state.getName().length(), helperRect);
 
         int width = helperRect.width() / 2;
@@ -220,51 +220,51 @@ public class StateMachineView extends View {
         result.top = state.getY() - STATE_OVAL_OFFSET - height;
         result.bottom = state.getY() + STATE_OVAL_OFFSET - height;
 
-        if(!forDrawing && state.isInitialState()){
+        if (!forDrawing && state.isInitialState()) {
             RectUtils.extendRect(result, INITIAL_STATE_OFFSET);
         }
     }
 
     public void translatePoint(PointF point) {
-        point.x=point.x/scale+clipBounds.left;
-        point.y=point.y/scale+clipBounds.top;
+        point.x = point.x / scale + clipBounds.left;
+        point.y = point.y / scale + clipBounds.top;
     }
 
-    public void highlighteState(State s){
-        highlightedState=s;
+    public void highlighteState(State s) {
+        highlightedState = s;
         postInvalidate();
     }
 
-    public void highlighteTransition(Transition trans){
-        highlightedTransition=trans;
+    public void highlighteTransition(Transition trans) {
+        highlightedTransition = trans;
         postInvalidate();
     }
 
-    public void setTempPath(Path p){
-        tempPath=p;
+    public void setTempPath(Path p) {
+        tempPath = p;
         postInvalidate();
     }
 
-    private void makeArrowHead(PointF secondPoint, PointF endPoint){
+    private void makeArrowHead(PointF secondPoint, PointF endPoint) {
 
-        PointF dir= PointUtils.calculateDirection(endPoint, secondPoint);
+        PointF dir = PointUtils.calculateDirection(endPoint, secondPoint);
         PointUtils.normalize(dir);
 
-        PointF first=new PointF(-dir.y,dir.x);
-        PointF second=new PointF(dir.y,-dir.x);
-        first.x*=10;
-        first.y*=10;
-        second.x*=10;
-        second.y*=10;
-        dir.x*=20;
-        dir.y*=20;
-        dir.x+=endPoint.x;
-        dir.y+=endPoint.y;
+        PointF first = new PointF(-dir.y, dir.x);
+        PointF second = new PointF(dir.y, -dir.x);
+        first.x *= 10;
+        first.y *= 10;
+        second.x *= 10;
+        second.y *= 10;
+        dir.x *= 20;
+        dir.y *= 20;
+        dir.x += endPoint.x;
+        dir.y += endPoint.y;
 
         arrowHead.rewind();
-        arrowHead.moveTo(endPoint.x,endPoint.y);
-        arrowHead.lineTo(dir.x+first.x,dir.y+first.y);
-        arrowHead.lineTo(dir.x+second.x,dir.y+second.y);
+        arrowHead.moveTo(endPoint.x, endPoint.y);
+        arrowHead.lineTo(dir.x + first.x, dir.y + first.y);
+        arrowHead.lineTo(dir.x + second.x, dir.y + second.y);
         arrowHead.close();
     }
 }

@@ -7,22 +7,22 @@ import android.graphics.Color;
  */
 public class ColorActuator extends Actuator {
 
-    private int defaultColor= Color.RED;
+    private int defaultColor = Color.RED;
 
     public ColorActuator(String key, String topic, String topicType, String topicPackage, String objectInMessage) {
         super(key, topic, topicType, topicPackage, objectInMessage);
     }
 
-    public ColorActuator(String key, String topic, String topicType, String topicPackage, String objectInMessage,int color) {
+    public ColorActuator(String key, String topic, String topicType, String topicPackage, String objectInMessage, int color) {
         super(key, topic, topicType, topicPackage, objectInMessage);
-        defaultColor=color;
+        defaultColor = color;
     }
 
-    public void setDefaultColor(int color){
-        defaultColor=color;
+    public void setDefaultColor(int color) {
+        defaultColor = color;
     }
 
-    public  int getDefaultColor(){
+    public int getDefaultColor() {
         return defaultColor;
     }
 }

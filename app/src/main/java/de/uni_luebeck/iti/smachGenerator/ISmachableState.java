@@ -15,18 +15,21 @@ public interface ISmachableState {
 
     /**
      * Returns a List of all transitions from this state.
+     *
      * @return a List of transitions
      */
     public abstract List<? extends ISmachableTransition> getTransitions();
 
     /**
      * Returns true if this is the initial state, there may only be one initial state.
+     *
      * @return true if this is the initial state
      */
     public abstract boolean isInitialState();
 
     /**
      * Returns the name of this state.
+     *
      * @return the name of the state
      */
     public abstract String getName();

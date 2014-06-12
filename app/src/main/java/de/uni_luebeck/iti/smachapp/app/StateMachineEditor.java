@@ -13,7 +13,6 @@ import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -27,8 +26,8 @@ import de.uni_luebeck.iti.smachapp.view.StateMachineView;
 
 public class StateMachineEditor extends Activity {
 
-    private static final String USE_OLD_MODEL="USE_OLD_EDITOR_MODEL";
-    private static EditorModel oldModel=null;
+    private static final String USE_OLD_MODEL = "USE_OLD_EDITOR_MODEL";
+    private static EditorModel oldModel = null;
 
     private StateMachineEditorController controller;
 
@@ -38,69 +37,69 @@ public class StateMachineEditor extends Activity {
 
         EditorModel model;
 
-        if(savedInstanceState!=null && savedInstanceState.getBoolean(USE_OLD_MODEL,false) && oldModel!=null){
-            model=oldModel;
-            oldModel=null;
-        }else{
-            model=new EditorModel(getIntent().getStringExtra("name"));
-            oldModel=null;
+        if (savedInstanceState != null && savedInstanceState.getBoolean(USE_OLD_MODEL, false) && oldModel != null) {
+            model = oldModel;
+            oldModel = null;
+        } else {
+            model = new EditorModel(getIntent().getStringExtra("name"));
+            oldModel = null;
 
-            State state=new State(model.getNextStateName(),0,0,true);
+            State state = new State(model.getNextStateName(), 0, 0, true);
             model.getStateMachine().addState(state);
         }
 
         setContentView(R.layout.activity_state_machine_editor);
 
-        StateMachineView view=(StateMachineView)findViewById(R.id.editorView);
+        StateMachineView view = (StateMachineView) findViewById(R.id.editorView);
         registerForContextMenu(view);
 
-        controller=new StateMachineEditorController(model,view,this);
+        controller = new StateMachineEditorController(model, view, this);
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
-        ActionBar bar=getActionBar();
+        ActionBar bar = getActionBar();
         findViewById(R.id.editorView).postInvalidate();
-        if(bar!=null){
+        if (bar != null) {
             bar.hide();
         }
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle bundle){
+    protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        oldModel=controller.getModel();
-        bundle.putBoolean(USE_OLD_MODEL,true);
+        oldModel = controller.getModel();
+        bundle.putBoolean(USE_OLD_MODEL, true);
     }
 
-    public void switchModes(View view){
-        if(view.getId()==R.id.edit_states){
+    public void switchModes(View view) {
+        if (view.getId() == R.id.edit_states) {
             view.setEnabled(false);
             controller.modeSwitch(EditorModel.EditorState.EDIT_STATES);
             findViewById(R.id.edit_transitions).setEnabled(true);
-        }else if(view.getId()==R.id.edit_transitions){
+        } else if (view.getId() == R.id.edit_transitions) {
             view.setEnabled(false);
             controller.modeSwitch(EditorModel.EditorState.EDIT_TRANSITIONS);
             findViewById(R.id.edit_states).setEnabled(true);
         }
     }
 
-    public void resetView(View view){
+    public void resetView(View view) {
         controller.resetView();
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu,v,menuInfo);
-        MenuInflater inflater=getMenuInflater();
-        switch(controller.getModel().getCurrentState()){
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        switch (controller.getModel().getCurrentState()) {
 
             case EDIT_STATES:
-                inflater.inflate(R.menu.context_menu_state,menu);
+                inflater.inflate(R.menu.context_menu_state, menu);
                 break;
             case EDIT_TRANSITIONS:
-                inflater.inflate(R.menu.context_menu_trans,menu);
+                inflater.inflate(R.menu.context_menu_trans, menu);
                 break;
         }
     }
@@ -110,43 +109,43 @@ public class StateMachineEditor extends Activity {
         return controller.onContextItemSelected(item);
     }
 
-    public void showStateProperties(State s){
-        Intent intent=new Intent(this,StateProperty.class);
+    public void showStateProperties(State s) {
+        Intent intent = new Intent(this, StateProperty.class);
         StateProperty.setupState(s, controller.getModel().getRobot());
         startActivity(intent);
     }
 
     public void showTransitionProperites(Transition t) {
-        Intent intent =new Intent(this,TransitionProperty.class);
-        TransitionProperty.setupTransition(t,controller.getModel().getRobot());
+        Intent intent = new Intent(this, TransitionProperty.class);
+        TransitionProperty.setupTransition(t, controller.getModel().getRobot());
         startActivity(intent);
     }
 
-    public void transmit(View view){
+    public void transmit(View view) {
         controller.compile();
 
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle(R.string.enterAddress);
-        final EditText text=new EditText(this);
+        final EditText text = new EditText(this);
         text.setInputType(InputType.TYPE_CLASS_PHONE);
         text.setImeOptions(EditorInfo.IME_ACTION_SEND);
         builder.setView(text);
 
-        builder.setPositiveButton(R.string.send,new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 controller.transmit(text.getText().toString());
             }
         });
 
-        builder.setNegativeButton(R.string.disrecard,new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.disrecard, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
             }
         });
 
-        final AlertDialog dia= builder.show();
+        final AlertDialog dia = builder.show();
         text.postDelayed(new Runnable() {
             @Override
             public void run() {

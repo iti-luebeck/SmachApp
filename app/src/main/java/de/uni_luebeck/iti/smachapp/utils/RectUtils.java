@@ -8,17 +8,17 @@ import android.graphics.RectF;
  */
 public class RectUtils {
 
-    public static void extendRect(RectF rectangle,float margin){
+    public static void extendRect(RectF rectangle, float margin) {
         rectangle.left -= margin;
         rectangle.right += margin;
         rectangle.top -= margin;
         rectangle.bottom += margin;
     }
 
-    public static void makeRectFromPoint(PointF point,RectF result){
-        result.left=point.x;
-        result.right=point.x;
-        result.top=point.y;
-        result.bottom=point.y;
+    public static void makeRectFromPoint(PointF point, RectF result) {
+        result.left = point.x;
+        result.right = point.x;
+        result.top = point.y;
+        result.bottom = point.y;
     }
 }

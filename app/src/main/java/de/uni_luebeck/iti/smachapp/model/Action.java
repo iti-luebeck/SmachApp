@@ -10,9 +10,9 @@ public class Action implements ISmachableAction {
     private String key;
     private int value;
 
-    public Action(String key,int value){
-        this.key=key;
-        this.value=value;
+    public Action(String key, int value) {
+        this.key = key;
+        this.value = value;
     }
 
     @Override
@@ -25,11 +25,11 @@ public class Action implements ISmachableAction {
         return value;
     }
 
-    public void setKey(String key){
-        this.key=key;
+    public void setKey(String key) {
+        this.key = key;
     }
 
-    public void setValue(int value){
-        this.value=value;
+    public void setValue(int value) {
+        this.value = value;
     }
 }

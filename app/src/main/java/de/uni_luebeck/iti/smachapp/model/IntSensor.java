@@ -10,22 +10,22 @@ public class IntSensor extends Sensor {
     private int max;
 
 
-    public IntSensor(String key,String topic,String topicType,String topicPackage,String objectInMessage,int min,int max){
-       super(key,topic,topicType,topicPackage,objectInMessage);
-        this.min=min;
-        this.max=max;
+    public IntSensor(String key, String topic, String topicType, String topicPackage, String objectInMessage, int min, int max) {
+        super(key, topic, topicType, topicPackage, objectInMessage);
+        this.min = min;
+        this.max = max;
     }
 
-    public int getMax(){
+    public int getMax() {
         return max;
     }
 
-    public int getMin(){
+    public int getMin() {
         return min;
     }
 
-    public void setMax(int max){
-        this.max=max;
+    public void setMax(int max) {
+        this.max = max;
     }
 
     public void setMin(int min) {
@@ -34,6 +34,6 @@ public class IntSensor extends Sensor {
 
     @Override
     public String getTransitionCondition(Operator op, int compVal) {
-        return key+op+compVal;
+        return key + op + compVal;
     }
 }

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/context_menu_delete"
+    <item
+        android:id="@+id/context_menu_delete"
         android:title="@string/delete" />
-    <item android:id="@+id/context_menu_make_initial"
-        android:title="@string/make_state_initial"/>
-    <item android:id="@+id/context_menu_properties"
+    <item
+        android:id="@+id/context_menu_make_initial"
+        android:title="@string/make_state_initial" />
+    <item
+        android:id="@+id/context_menu_properties"
         android:title="@string/properties" />
 
 </menu>

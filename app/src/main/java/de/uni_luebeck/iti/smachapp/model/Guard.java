@@ -11,9 +11,9 @@ import de.uni_luebeck.iti.smachGenerator.Operator;
  */
 public class Guard implements ISmachableGuard {
 
-    private LinkedList<String> names=new LinkedList<String>();
-    private LinkedList<Operator> operators=new LinkedList<Operator>();
-    private LinkedList<Integer> values=new LinkedList<Integer>();
+    private LinkedList<String> names = new LinkedList<String>();
+    private LinkedList<Operator> operators = new LinkedList<Operator>();
+    private LinkedList<Integer> values = new LinkedList<Integer>();
 
 
     @Override
@@ -31,37 +31,37 @@ public class Guard implements ISmachableGuard {
         return values;
     }
 
-    public void add(String name,Operator op,int value){
+    public void add(String name, Operator op, int value) {
         names.add(name);
         operators.add(op);
         values.add(value);
     }
 
-    public void remove(int i){
+    public void remove(int i) {
         names.remove(i);
         operators.remove(i);
         values.remove(i);
     }
 
-    public void updateName(int i,String name){
-        names.set(i,name);
+    public void updateName(int i, String name) {
+        names.set(i, name);
     }
 
-    public void updateOperator(int i,Operator op){
-        operators.set(i,op);
+    public void updateOperator(int i, Operator op) {
+        operators.set(i, op);
     }
 
-    public void updateValue(int i,int value){
-        values.set(i,value);
+    public void updateValue(int i, int value) {
+        values.set(i, value);
     }
 
-    public void updateAll(int i,String name,Operator op,int value){
-        updateName(i,name);
-        updateOperator(i,op);
-        updateValue(i,value);
+    public void updateAll(int i, String name, Operator op, int value) {
+        updateName(i, name);
+        updateOperator(i, op);
+        updateValue(i, value);
     }
 
-    public void clear(){
+    public void clear() {
         names.clear();
         operators.clear();
         values.clear();

@@ -11,49 +11,49 @@ import java.util.List;
  */
 public class StateMachine implements Iterable<State> {
 
-    private LinkedList<State> states=new LinkedList<State>();
+    private LinkedList<State> states = new LinkedList<State>();
     private String name;
 
-    public StateMachine(String name){
-        this.name=name;
+    public StateMachine(String name) {
+        this.name = name;
     }
 
     @Override
-    public Iterator<State> iterator(){
+    public Iterator<State> iterator() {
         return states.iterator();
     }
 
-    public List<Transition> getTransitions(){
-        List<Transition> trans=new LinkedList<Transition>();
+    public List<Transition> getTransitions() {
+        List<Transition> trans = new LinkedList<Transition>();
 
-        for(State x:this){
+        for (State x : this) {
             trans.addAll(x.getTransitions());
         }
 
         return trans;
     }
 
-    public void addState(State s){
+    public void addState(State s) {
         states.add(s);
     }
 
-    public State getState(int i){
+    public State getState(int i) {
         return states.get(i);
     }
 
-    public int getStateCount(){
+    public int getStateCount() {
         return states.size();
     }
 
-    public void removeState(State s){
-        if(s.isInitialState()){
+    public void removeState(State s) {
+        if (s.isInitialState()) {
             throw new IllegalArgumentException("You can not remove the initial State.");
         }
-        for(State curr:this){
-            Iterator<Transition> iter=curr.iterator();
+        for (State curr : this) {
+            Iterator<Transition> iter = curr.iterator();
 
-            while(iter.hasNext()){
-                if(iter.next().getFollowerState()==s){
+            while (iter.hasNext()) {
+                if (iter.next().getFollowerState() == s) {
                     iter.remove();
                 }
             }
@@ -61,9 +61,9 @@ public class StateMachine implements Iterable<State> {
         states.remove(s);
     }
 
-    public void addTransition(Transition t){
-        State s=t.getPreviousState();
-        if(!states.contains(s)||!states.contains(t.getFollowerState())){
+    public void addTransition(Transition t) {
+        State s = t.getPreviousState();
+        if (!states.contains(s) || !states.contains(t.getFollowerState())) {
             throw new IllegalArgumentException("The previous or following state is not part of " +
                     "this StateMachine.");
         }
@@ -71,35 +71,35 @@ public class StateMachine implements Iterable<State> {
         s.addTransition(t);
     }
 
-    public void removeTransition(Transition t){
+    public void removeTransition(Transition t) {
         t.getPreviousState().removeTransition(t);
     }
 
-    public List<Transition> getTransitions(State from, State to){
-        List<Transition> trans=new ArrayList<Transition>(from.getTransitions());
+    public List<Transition> getTransitions(State from, State to) {
+        List<Transition> trans = new ArrayList<Transition>(from.getTransitions());
 
-        for(Iterator<Transition> iter=trans.iterator();iter.hasNext();){
-            if(iter.next().getFollowerState()!=to){
+        for (Iterator<Transition> iter = trans.iterator(); iter.hasNext(); ) {
+            if (iter.next().getFollowerState() != to) {
                 iter.remove();
             }
         }
         return trans;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public List<State> getStates(){
+    public List<State> getStates() {
         return states;
     }
 
     public List<Transition> getIncomingTransitions(State state) {
-        List<Transition> res=new LinkedList<Transition>();
+        List<Transition> res = new LinkedList<Transition>();
 
-        for(State curr:this){
-            for(Transition trans:curr){
-                if(trans.getFollowerState()==state){
+        for (State curr : this) {
+            for (Transition trans : curr) {
+                if (trans.getFollowerState() == state) {
                     res.add(trans);
                 }
             }
