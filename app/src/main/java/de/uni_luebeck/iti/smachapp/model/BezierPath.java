@@ -140,6 +140,27 @@ public class BezierPath {
 
         return res;
     }
+
+
+    public void reset() {
+        PointF first=knots.get(0);
+        PointF last=knots.get(knots.size()-1);
+
+        knots.clear();
+
+        PointF dir=PointUtils.calculateDirection(first,last);
+        float numOfPoints=dir.length()/MIN_DISTANCE;
+        dir.x/=numOfPoints;
+        dir.y/=numOfPoints;
+
+        knots.add(first);
+        for(int i=1;i<(int)numOfPoints;i++){
+            knots.add(new PointF(first.x+dir.x*i,first.y+dir.y*i));
+        }
+        knots.add(last);
+        resize();
+    }
+
     /*
         Code adapted from:http://www.codeproject.com/Articles/31859/Draw-a-Smooth-Curve-through-a-Set-of-2D-Points-wit
      */
@@ -288,10 +309,18 @@ public class BezierPath {
 
         PointF lastPoint=new PointF(point.x,point.y);
 
-        while(ovalTestValue(oval,point)>1){
-            lastPoint.set(point);
-            point.x+=dir.x;
-            point.y+=dir.y;
+        if(ovalTestValue(oval,point)>1) {
+            while (ovalTestValue(oval, point) > 1) {
+                lastPoint.set(point);
+                point.x += dir.x;
+                point.y += dir.y;
+            }
+        }else{
+            while (ovalTestValue(oval, point) < 1) {
+                lastPoint.set(point);
+                point.x -= dir.x;
+                point.y -= dir.y;
+            }
         }
 
         point.set(lastPoint);

@@ -15,99 +15,107 @@ import de.uni_luebeck.iti.smachapp.model.BezierPath;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
 import de.uni_luebeck.iti.smachapp.utils.PointUtils;
+import de.uni_luebeck.iti.smachapp.utils.RectUtils;
 
 /**
  * Created by Morten Mey on 28.04.2014.
  */
-public class TransitionController implements ExtendedGestureListener{
+public class TransitionController implements ExtendedGestureListener {
+
+    public static final float MARGIN = 25f;
 
     private StateMachineEditorController cont;
 
-    private RectF rect=new RectF();
-    private PointF point=new PointF();
-    private Path tempPath=new Path();
-    private List<PointF> points=new LinkedList<PointF>();
+    private Path tempPath = new Path();
+    private List<PointF> points = new LinkedList<PointF>();
 
-    private boolean isLongPress=false;
+    private boolean isLongPress = false;
+    private boolean isScroll = false;
 
-    private State begin=null;
-    private Transition selected=null;
-    private int closestPoint=0;
-    private PointF originalPoint=new PointF();
-    private PointF lastPoint=new PointF();
+    private State begin = null;
+    private Transition selected = null;
+    private int closestPoint = 0;
+    private PointF originalPoint = new PointF();
+    private PointF lastPoint = new PointF();
 
-    public TransitionController(StateMachineEditorController cont){
-        this.cont=cont;
+    public TransitionController(StateMachineEditorController cont) {
+        this.cont = cont;
     }
 
     @Override
     public boolean onDown(MotionEvent motionEvent) {
-        begin=null;
-        selected=null;
+        begin = null;
+        selected = null;
         tempPath.reset();
         points.clear();
-        isLongPress=false;
+        isLongPress = false;
+        isScroll = false;
 
-        point.set(motionEvent.getX(),motionEvent.getY());
+        PointF point = new PointF(motionEvent.getX(), motionEvent.getY());
         cont.getView().translatePoint(point);
 
-        for(State s:cont.getModel().getStateMachine()){
-            cont.getView().getStateRect(s,rect);
-            if(rect.contains(point.x,point.y)){
-                begin=s;
-                tempPath.moveTo(point.x,point.y);
-                points.add(new PointF(point.x,point.y));
+        RectF rect = new RectF();
+        for (State s : cont.getModel().getStateMachine()) {
+            cont.getView().getStateRect(s, rect);
+            if (rect.contains(point.x, point.y)) {
+                begin = s;
+                tempPath.moveTo(point.x, point.y);
+                points.add(new PointF(point.x, point.y));
                 cont.getView().setTempPath(tempPath);
-                break;
+                return true;
             }
         }
 
-        for(Transition trans:cont.getModel().getStateMachine().getTransitions()){
-            List<PointF> transPoints=trans.getPath().getPoints();
-            for(int i=1;i<transPoints.size()-1;i++){
-                PointF curr=transPoints.get(i);
-                float dist=PointUtils.distance(curr,point);
+        float minDistance=BezierPath.MIN_DISTANCE;
+        for (Transition trans : cont.getModel().getStateMachine().getTransitions()) {
+            List<PointF> transPoints = trans.getPath().getPoints();
+            for (int i = 0; i < transPoints.size() - 1; i++) {
+                PointF curr = transPoints.get(i);
+                float dist = PointUtils.distance(curr, point);
 
-                if(dist<BezierPath.RELAXED_MIN_DISTANCE){
-                    selected=trans;
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    selected = trans;
                     lastPoint.set(point);
-                    originalPoint.set(point);
+                    originalPoint.set(curr);
 
-                    closestPoint=i;
+                    closestPoint = i;
 
-                    if(i+2<transPoints.size()){
-                        PointF nextPoint=transPoints.get(i+1);
+                    if (i + 1 < transPoints.size()) {
+                        PointF nextPoint = transPoints.get(i + 1);
 
-                        if(dist>PointUtils.distance(nextPoint,point)){
-                            closestPoint=i+1;
+                        float secondDist = PointUtils.distance(nextPoint, point);
+                        if (dist > secondDist) {
+                            closestPoint = i + 1;
+                            originalPoint.set(nextPoint);
+                            minDistance = secondDist;
                         }
                     }
 
                     break;
                 }
             }
-            if(selected!=null){
-                break;
-            }
         }
 
-        return begin!=null || selected!=null;
+         return selected!=null;
     }
 
     @Override
     public void onUp(MotionEvent e) {
         cont.getView().setTempPath(null);
-        if(isLongPress){
+        if (isLongPress) {
             return;
         }
         cont.getView().highlighteTransition(null);
 
-        if(begin!=null) {
+        if (begin != null && isScroll) {
             State end = null;
-            point.set(e.getX(), e.getY());
+            PointF point = new PointF(e.getX(), e.getY());
             cont.getView().translatePoint(point);
+            RectF rect = new RectF();
             for (State s : cont.getModel().getStateMachine()) {
                 cont.getView().getStateRect(s, rect);
+                RectUtils.extendRect(rect, MARGIN);
                 if (rect.contains(point.x, point.y)) {
                     end = s;
                     points.add(new PointF(point.x, point.y));
@@ -117,11 +125,10 @@ public class TransitionController implements ExtendedGestureListener{
             if (end == null) {
                 Toast toast = Toast.makeText(cont.getView().getContext(), R.string.must_end_at_state, Toast.LENGTH_LONG);
                 toast.show();
-            }else if(begin==end){
-                Toast toast=Toast.makeText(cont.getView().getContext(),R.string.begin_must_not_be_end,Toast.LENGTH_LONG);
+            } else if (begin == end) {
+                Toast toast = Toast.makeText(cont.getView().getContext(), R.string.begin_must_not_be_end, Toast.LENGTH_LONG);
                 toast.show();
             } else {
-                RectF rect = new RectF();
                 cont.getView().getStateRect(begin, rect);
                 BezierPath.removePointsInOval(rect, points);
                 BezierPath.moveOnOval(rect, points.get(0));
@@ -134,7 +141,54 @@ public class TransitionController implements ExtendedGestureListener{
                 Transition newTrans = new Transition(begin, end, cont.getModel().getNextTransitionName(), new BezierPath(points));
                 cont.getModel().getStateMachine().addTransition(newTrans);
             }
-        }else if(selected!=null){
+        } else if (selected != null && isScroll) {
+
+            boolean connected = false;
+            RectF rect = new RectF();
+
+            if (closestPoint == 0) {
+                for (State s : cont.getModel().getStateMachine()) {
+                    cont.getView().getStateRect(s, rect);
+                    RectUtils.extendRect(rect, MARGIN);
+                    PointF p = selected.getPath().getPoints().get(0);
+                    if (rect.contains(p.x, p.y)) {
+                        connected = true;
+                        if(selected.getPreviousState()!=null) {
+                            selected.getPreviousState().removeTransition(selected);
+                        }
+                        selected.setPreviousState(s);
+                        s.addTransition(selected);
+                        RectUtils.extendRect(rect,-MARGIN);
+                        BezierPath.moveOnOval(rect, p);
+                        break;
+                    }
+                }
+                if(!connected){
+                    selected.getPath().getPoints().get(0).set(originalPoint);
+                    Toast toast=Toast.makeText(cont.getView().getContext(),R.string.unconnected_transition,Toast.LENGTH_LONG);
+                    toast.show();
+                }
+
+            } else if (closestPoint == selected.getPath().getPoints().size() - 1) {
+                for (State s : cont.getModel().getStateMachine()) {
+                    cont.getView().getStateRect(s, rect);
+                    RectUtils.extendRect(rect, MARGIN);
+                    PointF p = selected.getPath().getPoints().get(selected.getPath().getPoints().size() - 1);
+                    if (rect.contains(p.x, p.y)) {
+                        connected = true;
+                        selected.setFollowerState(s);
+                        RectUtils.extendRect(rect,-MARGIN);
+                        BezierPath.moveOnOval(rect, p);
+                        break;
+                    }
+                }
+                if(!connected){
+                    selected.getPath().getPoints().get(selected.getPath().getPoints().size()-1).set(originalPoint);
+                    Toast toast=Toast.makeText(cont.getView().getContext(),R.string.unconnected_transition,Toast.LENGTH_LONG);
+                    toast.show();
+                }
+            }
+
             selected.getPath().fixBeginning();
             selected.getPath().fixEnd();
         }
@@ -147,7 +201,7 @@ public class TransitionController implements ExtendedGestureListener{
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
-        if(selected!=null){
+        if (selected != null) {
             cont.showTransitionProperties(selected);
             return true;
         }
@@ -157,33 +211,33 @@ public class TransitionController implements ExtendedGestureListener{
     @Override
     public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent2, float v, float v2) {
 
-        point.x=motionEvent2.getX();
-        point.y=motionEvent2.getY();
+        isScroll = true;
+        PointF point = new PointF(motionEvent2.getX(), motionEvent2.getY());
         cont.getView().translatePoint(point);
 
-        if(begin!=null){
-            tempPath.lineTo(point.x,point.y);
-            points.add(new PointF(point.x,point.y));
+        if (begin != null) {
+            tempPath.lineTo(point.x, point.y);
+            points.add(new PointF(point.x, point.y));
             cont.getView().postInvalidate();
             return true;
-        }else if(selected!=null){
+        } else if (selected != null) {
 
-            PointF temp=PointUtils.calculateDirection(lastPoint, point);
+            PointF temp = PointUtils.calculateDirection(lastPoint, point);
             lastPoint.set(point);
 
-            selected.getPath().moveKnots(temp.x,temp.y,closestPoint);
+            selected.getPath().moveKnots(temp.x, temp.y, closestPoint);
             cont.getView().postInvalidate();
 
             return true;
-        }else{
+        } else {
             return false;
         }
     }
 
     @Override
     public void onLongPress(MotionEvent motionEvent) {
-        if(selected!=null){
-            isLongPress=true;
+        if (selected != null) {
+            isLongPress = true;
             cont.showContextMenu();
         }
     }
@@ -195,10 +249,14 @@ public class TransitionController implements ExtendedGestureListener{
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        switch(item.getItemId()){
+        cont.getView().highlighteTransition(null);
+        switch (item.getItemId()) {
             case R.id.context_menu_delete:
                 cont.getModel().getStateMachine().removeTransition(selected);
-                cont.getView().highlighteTransition(null);
+                return true;
+
+            case R.id.context_menu_reset:
+                selected.getPath().reset();
                 return true;
 
             case R.id.context_menu_properties:

@@ -3,15 +3,21 @@ package de.uni_luebeck.iti.smachapp.app;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import de.uni_luebeck.iti.smachapp.controller.StateMachineEditorController;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
@@ -123,10 +129,11 @@ public class StateMachineEditor extends Activity {
 
         builder.setTitle(R.string.enterAddress);
         final EditText text=new EditText(this);
-        text.setInputType(InputType.TYPE_CLASS_TEXT);
+        text.setInputType(InputType.TYPE_CLASS_PHONE);
+        text.setImeOptions(EditorInfo.IME_ACTION_SEND);
         builder.setView(text);
 
-        builder.setPositiveButton(R.string.next,new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.send,new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 controller.transmit(text.getText().toString());
@@ -136,11 +143,28 @@ public class StateMachineEditor extends Activity {
         builder.setNegativeButton(R.string.disrecard,new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
             }
         });
 
-        builder.show();
+        final AlertDialog dia= builder.show();
+        text.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager keyboard = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                keyboard.showSoftInput(text, 0);
+            }
+        }, 200);
+
+        text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                dia.dismiss();
+                controller.transmit(text.getText().toString());
+                return true;
+            }
+        });
+
     }
 
 }

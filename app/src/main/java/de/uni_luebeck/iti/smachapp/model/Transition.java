@@ -52,5 +52,11 @@ public class Transition implements ISmachableTransition {
         return path;
     }
 
+    public void setPreviousState(State s){
+        previous=s;
+    }
 
+    public void setFollowerState(State s){
+        next=s;
+    }
 }

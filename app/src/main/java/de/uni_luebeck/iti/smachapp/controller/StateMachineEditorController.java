@@ -171,7 +171,7 @@ public class StateMachineEditorController implements View.OnTouchListener,ScaleG
     }
 
     public void compile(){
-        SmachAutomat automat=new SmachAutomat(model.getStateMachine().getStates(),model.getRobot().getSensors(),model.getRobot().getActuators());
+       SmachAutomat automat = new SmachAutomat(model.getStateMachine().getStates(), model.getRobot().getSensors(), model.getRobot().getActuators());
         automat.saveToFile(model.getPythonFile());
     }
 

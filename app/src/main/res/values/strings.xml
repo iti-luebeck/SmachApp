@@ -30,5 +30,8 @@
     <string name="title_activity_transition_property">Übergangseigenschaften</string>
     <string name="transition">Übergang:</string>
     <string name="transition_name_hint">Der Name des Übergangs</string>
+    <string name="reset_transition">Zurücksetzen</string>
+    <string name="send">Senden</string>
+    <string name="unconnected_transition">Unverbundene Transitionen sind nicht erlaubt.</string>
 
 </resources>
