@@ -1,54 +1,84 @@
 package de.uni_luebeck.iti.smachGenerator;
 
-/**
- * A Sensor of the robot that can be used to evaluate Guards.
- */
+import java.util.Set;
+
 public interface ISmachableSensor {
 
     /**
-     * Returns the name of the sensors topic.
-     *
-     * @return the name of the topic
+     * @return the name of the sensor
      */
-    public abstract String getTopic();
+    public abstract String getName();
 
     /**
-     * Returns the key of this sensor.
      *
-     * @return the key
+     * @return a HashSet of all Imports that are needed for this
+     *         {@link ISmachableSensor}.
      */
-    public abstract String getKey();
+    public abstract Set<String> getImports();
 
     /**
-     * Returns the object in the message.
      *
-     * @return the object in the message
-     * @see de.uni_luebeck.iti.smachGenerator.ISmachableActuator
+     * Creates the callback function for this sensor. All calculations (if
+     * necessary) to be able to compare values for later transitions have to be
+     * done here and the result has to be stored in the
+     * <code>ValueIdentifier</code>. This <code>ValueIdentifier</code> has to be
+     * the same that is initialized by <code>getIdentifierInit()</code> and
+     * <code>getGlobalIdentifier</code>.
+     *
+     * @return the callback for this sensor.
      */
-    public abstract String getObjectInMessage();
+    public abstract String getCallback();
 
     /**
-     * Returns the type of this sensors topic.
+     * Creates the Subscriber Setup statement. The callback for this Subscriber
+     * will be the one that is created by <code>getCallback()</code>.
      *
-     * @return the type of the topic
+     * @return Subscriber initialization
      */
-    public abstract String getTopicType();
+    public abstract String getSubscriberSetup();
 
     /**
-     * Returns the package that contains the topic type.
-     *
-     * @return the package
+     * @return the identifier that stores the current value of this sensor.
      */
-    public abstract String getTopicPackage();
+    public abstract String getValueIdentifier();
 
     /**
-     * Returns a valid Pyhton boolean expression, that evaluates to true, if the condition indicated
-     * by op and CompVal is true.
+     * Returns the identifier of the globally defined variable for this sensor.
+     * <p>
+     * NOTE: this means this might return the name of an Array or anything else.
+     * To receive the identifier that stores the current value of this sensor,
+     * use <code>getValueIdentifier()</code>!</p>
+     * <p><i>May not be empty!</i></p>
      *
-     * @param op      the operator to use
-     * @param compVal the value to which the current sensor value should be compared
-     * @return a valid Python boolean expression
+     * @return globally identifier name.
      */
-    public abstract String getTransitionCondition(Operator op, int compVal);
+    public abstract String getGlobalIdentifier();
+
+    /**
+     * <p><i>May not be empty!</i></p>
+     *
+     * @return statements to define and initialize the value the callback stores
+     *         values in.
+     */
+    public abstract String getIdentifierInit();
+
+    /** Returns the condition comparing the current sensor value with the compare
+     * value.
+     *
+     * @param op
+     *            Operator to compare the values. Choose one of <, <=, ==, >=, >, !=
+     * @param compVal
+     *            value to compare the current sensor value with.
+     * @return a condition representing the comparison of the sensor value with
+     *         the compare value.
+     */
+    public abstract String getTransitionCondition(String op, int compVal);
+
+    /**
+     * Returns a number of commands that shall be executed before the {@link SmachAutomat} is shut down.
+     * Mainly this will be publishing some last messages for the sensor to deactivate etc.
+     * @return Some commands to shutdown this sensor
+     */
+    public abstract String[] onShutDown();
 
 }

@@ -11,8 +11,8 @@ import java.util.List;
 
 import de.uni_luebeck.iti.smachapp.model.Action;
 import de.uni_luebeck.iti.smachapp.model.BeepRobot;
-import de.uni_luebeck.iti.smachapp.model.ColorActuator;
-import de.uni_luebeck.iti.smachapp.model.IntActuator;
+import de.uni_luebeck.iti.smachapp.model.BeepColorRGBActuator;
+import de.uni_luebeck.iti.smachapp.model.BeepMotorActuator;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.view.ActuatorUI;
 import de.uni_luebeck.iti.smachapp.view.ColorSelector;
@@ -46,20 +46,20 @@ public class StateProperty extends ActionBarActivity {
 
         LinearLayout container = (LinearLayout) findViewById(R.id.actuatorContainer);
 
-        for (IntActuator act : robot.getIntActuators()) {
+        for (BeepMotorActuator act : robot.getMotorActuators()) {
             IntSlider slider = new IntSlider(this, act);
             container.addView(slider);
-            uis.put(act.getKey(), slider);
+            uis.put(act.getName(), slider);
         }
 
-        for (ColorActuator act : robot.getColorActuators()) {
+        for (BeepColorRGBActuator act : robot.getColorRGBActuators()) {
             ColorSelector sel = new ColorSelector(this, act);
             container.addView(sel);
-            uis.put(act.getKey(), sel);
+            uis.put(act.getName(), sel);
         }
 
         for (Action a : state.getActions()) {
-            uis.get(a.getKey()).setToAction(a);
+            uis.get(a.getActuatorName()).setToAction(a);
         }
 
     }

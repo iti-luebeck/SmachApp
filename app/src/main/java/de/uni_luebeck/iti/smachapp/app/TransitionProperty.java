@@ -8,8 +8,8 @@ import android.widget.LinearLayout;
 import java.util.HashMap;
 
 import de.uni_luebeck.iti.smachapp.model.BeepRobot;
-import de.uni_luebeck.iti.smachapp.model.ColorSensor;
-import de.uni_luebeck.iti.smachapp.model.IntSensor;
+import de.uni_luebeck.iti.smachapp.model.BeepColorSensor;
+import de.uni_luebeck.iti.smachapp.model.BeepIRSensor;
 import de.uni_luebeck.iti.smachapp.model.Transition;
 import de.uni_luebeck.iti.smachapp.view.ColorSelector;
 import de.uni_luebeck.iti.smachapp.view.IntSlider;
@@ -43,17 +43,17 @@ public class TransitionProperty extends ActionBarActivity {
 
         LinearLayout container = (LinearLayout) findViewById(R.id.sensorContainer);
 
-        for (IntSensor sen : robot.getIntSensors()) {
+        for (BeepIRSensor sen : robot.getIntSensors()) {
             IntSlider slider = new IntSlider(this, sen);
             container.addView(slider);
-            uis.put(sen.getKey(), slider);
+            uis.put(sen.getName(), slider);
             slider.setToGuard(transition.getSmachableGuard());
         }
 
-        for (ColorSensor sen : robot.getColorSensors()) {
+        for (BeepColorSensor sen : robot.getColorSensors()) {
             ColorSelector sel = new ColorSelector(this, sen);
             container.addView(sel);
-            uis.put(sen.getKey(), sel);
+            uis.put(sen.getName(), sel);
             sel.setToGuard(transition.getSmachableGuard());
         }
     }

@@ -7,17 +7,17 @@ import de.uni_luebeck.iti.smachGenerator.ISmachableAction;
  */
 public class Action implements ISmachableAction {
 
-    private String key;
+    private String actuatorName;
     private int value;
 
     public Action(String key, int value) {
-        this.key = key;
+        this.actuatorName = key;
         this.value = value;
     }
 
     @Override
-    public String getKey() {
-        return key;
+    public String getActuatorName() {
+        return actuatorName;
     }
 
     @Override
@@ -25,8 +25,8 @@ public class Action implements ISmachableAction {
         return value;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setActuatorName(String actuatorName) {
+        this.actuatorName = actuatorName;
     }
 
     public void setValue(int value) {

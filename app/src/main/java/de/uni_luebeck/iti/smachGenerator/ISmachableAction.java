@@ -1,21 +1,20 @@
 package de.uni_luebeck.iti.smachGenerator;
 
-/**
- * An Action that can be executed by an {@link de.uni_luebeck.iti.smachGenerator.ISmachableActuator}.
- */
 public interface ISmachableAction {
 
     /**
-     * Returns the key of the Actuator for this Action.
+     * returns the name of the {@link ISmachableActuator} that shall perform an
+     * action
      *
-     * @return the key of the Actuator
+     * @return name of the {@link ISmachableActuator}
      */
-    public abstract String getKey();
+    public abstract String getActuatorName();
 
     /**
-     * Returns the value for the Actuator.
+     * returns the value the {@link ISmachableActuator} shall interpret as an
+     * action for it to do.
      *
-     * @return the value
+     * @return value representing the action
      */
     public abstract int getValue();
 

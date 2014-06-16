@@ -167,20 +167,17 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
         activity.showTransitionProperites(t);
     }
 
-    public void compile() {
-        SmachAutomat automat = new SmachAutomat(model.getStateMachine().getStates(), model.getRobot().getSensors(), model.getRobot().getActuators());
-        automat.saveToFile(model.getPythonFile());
-    }
-
-    public void transmit(String address) {
+    public void play(String address) {
         BeepRobot robot = model.getRobot();
+
+        SmachAutomat automat = new SmachAutomat(model.getStateMachine().getStates(), model.getRobot().getSensors(), model.getRobot().getActuators(), "zusmoro_state_machine");
+        automat.saveToFile(model.getPythonFile());
 
         try {
 
             robot.connect(address);
             robot.transmit(model.getPythonFile());
             robot.play();
-            robot.disconnect();
         } catch (Exception ex) {
             Toast toast = Toast.makeText(activity, R.string.connnectionFailure, Toast.LENGTH_LONG);
             toast.show();

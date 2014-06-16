@@ -19,93 +19,69 @@ import de.uni_luebeck.iti.smachGenerator.SmachableSensors;
 
 public class BeepRobot {
 
-    List<IntSensor> sensorsIR = new ArrayList<IntSensor>();
+    List<BeepIRSensor> sensorsIR = new ArrayList<BeepIRSensor>();
 
-    List<ColorSensor> sensorsCol = new ArrayList<ColorSensor>();
+    List<BeepColorSensor> sensorsCol = new ArrayList<BeepColorSensor>();
 
-    List<IntActuator> intActuators = new ArrayList<IntActuator>();
-    List<ColorActuator> colorActuators = new ArrayList<ColorActuator>();
+    List<BeepMotorActuator> motorActuators = new ArrayList<BeepMotorActuator>();
+    List<BeepColorRGBActuator> colorRGBActuators = new ArrayList<BeepColorRGBActuator>();
 
     Connection conn;
     Session sess;
 
-    PrintWriter piCommand;
+    String piDirAutomat;
+    String automatFileName;
+    private PrintWriter piIn;
+    private BufferedReader piOut;
+    private boolean connected;
+
 
     public BeepRobot() {
-        // Define default Beep sensors
-        sensorsIR.add(new IntSensor("IR0", "topic/IR0", "Int8",
-                "std_msgs.msg", "data", -128, 127));
-        sensorsIR.add(new IntSensor("IR1", "topic/IR1", "Int8",
-                "std_msgs.msg", "data", -128, 127));
-        sensorsIR.add(new IntSensor("IR2", "topic/IR2", "Int8",
-                "std_msgs.msg", "data", -128, 127));
-        sensorsIR.add(new IntSensor("IR3", "topic/IR3", "Int8",
-                "std_msgs.msg", "data", -128, 127));
-        sensorsIR.add(new IntSensor("IR4", "topic/IR4", "Int8",
-                "std_msgs.msg", "data", -128, 127));
-        sensorsIR.add(new IntSensor("IR5", "topic/IR5", "Int8",
-                "std_msgs.msg", "data", -128, 127));
-        sensorsIR.add(new IntSensor("IR6", "topic/IR6", "Int8",
-                "std_msgs.msg", "data", -128, 127));
-        sensorsIR.add(new IntSensor("IR7", "topic/IR7", "Int8",
-                "std_msgs.msg", "data", -128, 127));
-
-
-        sensorsCol.add(new ColorSensor("UIR0", "topic/UIR0", "Int8",
-                "std_msgs.msg", "data"));
-        sensorsCol.add(new ColorSensor("UIR1", "topic/UIR2", "Int8",
-                "std_msgs.msg", "data"));
-        sensorsCol.add(new ColorSensor("UIR2", "topic/UIR3", "Int8",
-                "std_msgs.msg", "data"));
-
+        sensorsIR.add(new BeepIRSensor("IR0", "/IR_filtered", 0));
+        sensorsIR.add(new BeepIRSensor("IR1", "/IR_filtered", 1));
+        sensorsIR.add(new BeepIRSensor("IR2", "/IR_filtered", 2));
+        sensorsIR.add(new BeepIRSensor("IR3", "/IR_filtered", 3));
+        sensorsIR.add(new BeepIRSensor("IR4", "/IR_filtered", 4));
+        sensorsIR.add(new BeepIRSensor("IR5", "/IR_filtered", 5));
+        sensorsIR.add(new BeepIRSensor("IR6", "/IR_filtered", 6));
+        sensorsIR.add(new BeepIRSensor("IR7", "/IR_filtered", 7));
+        sensorsCol.add(new BeepColorSensor("UIR0", "/ground_colors", 0));
+        sensorsCol.add(new BeepColorSensor("UIR1", "/ground_colors", 1));
+        sensorsCol.add(new BeepColorSensor("UIR2", "/ground_colors", 2));
+        //beepTimer = new BeepSensorTimer("timer");
+       // smachableSensors.add(beepTimer);
 
         // Define default Beep actuators
-        // actuators.add(new BeepActuator("MOTOR1", "topic/motors", "Motors",
-        // "beep.msg", "links"));
-        // actuators.add(new BeepActuator("MOTOR2", "topic/motors", "Motors",
-        // "beep.msg", "rechts"));
-        intActuators.add(new IntActuator("MOTOR_L", "motor_l", "Int8", "std_msgs.msg", "data", -128, 127));
-        intActuators.add(new IntActuator("MOTOR_R", "motor_r", "Int8", "std_msgs.msg", "data", -128, 127));
+        motorActuators.add(new BeepMotorActuator("MOTOR_L", "/motor_l"));
+        motorActuators.add(new BeepMotorActuator("MOTOR_R", "/motor_r"));
 
-        colorActuators.add(new ColorActuator("LED0", "topic/LED0", "Int8",
-                "std_msgs.msg", "data"));
-        colorActuators.add(new ColorActuator("LED1", "topic/LED1", "Int8",
-                "std_msgs.msg", "data"));
-        colorActuators.add(new ColorActuator("LED2", "topic/LED2", "Int8",
-                "std_msgs.msg", "data"));
-        colorActuators.add(new ColorActuator("LED3", "topic/LED3", "Int8",
-                "std_msgs.msg", "data"));
-        colorActuators.add(new ColorActuator("LED4", "topic/LED4", "Int8",
-                "std_msgs.msg", "data"));
-        colorActuators.add(new ColorActuator("LED5", "topic/LED5", "Int8",
-                "std_msgs.msg", "data"));
-        colorActuators.add(new ColorActuator("LED6", "topic/LED6", "Int8",
-                "std_msgs.msg", "data"));
-        colorActuators.add(new ColorActuator("LED7", "topic/LED7", "Int8",
-                "std_msgs.msg", "data"));
-        colorActuators.add(new ColorActuator("LED8", "topic/LED8", "Int8",
-                "std_msgs.msg", "data"));
-        /*
-        Actuator beep = new Actuator("BEEP", "topic/beep", "Int8",
-				"std_msgs.msg", "data");
-		actuators.add(beep);
+        colorRGBActuators.add(new BeepColorRGBActuator("LED0", "/leds", 0));
+        colorRGBActuators.add(new BeepColorRGBActuator("LED1", "/leds", 1));
+        colorRGBActuators.add(new BeepColorRGBActuator("LED2", "/leds", 2));
+        colorRGBActuators.add(new BeepColorRGBActuator("LED3", "/leds", 3));
+        colorRGBActuators.add(new BeepColorRGBActuator("LED4", "/leds", 4));
+        colorRGBActuators.add(new BeepColorRGBActuator("LED5", "/leds", 5));
+        colorRGBActuators.add(new BeepColorRGBActuator("LED6", "/leds", 6));
+        colorRGBActuators.add(new BeepColorRGBActuator("LED7", "/leds", 7));
 
-	    */
+        //motors.add(new BeepMotorActuator("BEEP", "/beep"));
+
+        piDirAutomat = "/home/pi/ros/beep_framework/zusmoro_state_machine";
     }
 
-    public List<IntActuator> getIntActuators() {
-        return intActuators;
+    public List<BeepMotorActuator> getMotorActuators() {
+        return motorActuators;
     }
 
-    public List<ColorActuator> getColorActuators() {
-        return colorActuators;
+    public List<BeepColorRGBActuator> getColorRGBActuators() {
+        return colorRGBActuators;
     }
 
-    public List<IntSensor> getIntSensors() {
+    public List<BeepIRSensor> getIntSensors() {
         return sensorsIR;
     }
 
-    public List<ColorSensor> getColorSensors() {
+    public List<BeepColorSensor> getColorSensors() {
         return sensorsCol;
     }
 
@@ -118,43 +94,66 @@ public class BeepRobot {
 
     public SmachableActuators getActuators() {
         SmachableActuators act = new SmachableActuators();
-        act.addAll(intActuators);
-        act.addAll(colorActuators);
+        act.addAll(motorActuators);
+        act.addAll(colorRGBActuators);
         return act;
     }
 
     public boolean connect(String connectTo) {
-        conn = new Connection(connectTo);//beep: "141.83.158.207"
+
+        conn = new Connection(connectTo);
         try {
-            //connect and authorize
+            // connect and authorize
             conn.connect();
+
             conn.authenticateWithPassword("pi", "beep");
 
-            //start a compatible shell
+            // start a compatible shell
             sess = conn.openSession();
             sess.requestDumbPTY();
             sess.startShell();
-            piCommand = new PrintWriter(sess.getStdin(), true);
-            //echo to recognize when shell is ready to use
-            piCommand.println("echo 'ready to start'");
 
-            //print output and block until shell is "ready to start"
+            piIn = new PrintWriter(sess.getStdin(), true);
+
+            // echo to recognize when shell is ready to use
+            piIn.println("echo 'ready to start'");
+
+            // print output and block until shell is "ready to start"
             InputStream stdout = new StreamGobbler(sess.getStdout());
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(stdout));
-            while (true) {
-                String line = br.readLine();
-                if (line == null) {
-                    break;
-                }
+            piOut = new BufferedReader(new InputStreamReader(stdout));
+            String line = piOut.readLine();
+            while (line != null) {
                 System.out.println(line);
                 if (line.equals("ready to start")) {
                     break;
                 }
+                line = piOut.readLine();
             }
 
-            br.close();
-            stdout.close();
+            connected = true;
+
+            // Start a new roscore
+            piIn.println("mkdir -p ~/log");
+            try {
+                piOut.readLine(); // command
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (!isRoscoreRunning()) {
+                startNewRoscore();
+                try {
+                    Thread.sleep(4000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            startBeepNode();
+
+            try {
+                Thread.sleep(8000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             return true;
         } catch (Exception e) {
@@ -164,36 +163,132 @@ public class BeepRobot {
     }
 
     public void disconnect() {
-        piCommand.close();
-        piCommand = null;
-        sess.close();
-        sess = null;
-        conn.close();
-        conn = null;
+        connected = false;
+        piIn.close();
+        piIn = null;
+        try {
+            piOut.close();
+            piOut = null;
+            sess.close();
+            sess = null;
+            conn.close();
+            conn = null;
+        } catch (IOException e) {
+        }
+
     }
 
+    public void stop() {
+        if (connected) {
+            try {
+                piIn.println("pkill -2 -f 'python " + piDirAutomat + "/"
+                        + automatFileName + "'");
+                piOut.readLine(); // command
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-    public void transmit(File f) {
-        SCPClient client = new SCPClient(conn);
+        }
+
+    }
+
+    public boolean transmit(File file) {
+
+        automatFileName=file.getName();
+
         try {
-            client.put(f.getAbsolutePath(), "~/Beep/Software/catkin_ws/src/beep_imu");
+            SCPClient client = new SCPClient(conn);
+            client.put(file.getAbsolutePath(), piDirAutomat);
+            piIn.println("chmod +x " + piDirAutomat + "/" + automatFileName);
+            return true;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+            return false;
         }
     }
 
     public void play() {
-        if (conn != null && sess != null && piCommand != null) {
-            piCommand.println("mkdir -p ~/log");
-            piCommand
-                    .println("nohup roscore 2> ~/log/roscore-err.log 1> ~/log/roscore-out.log &");
-            piCommand
-                    .println("nohup rosrun beep_imu ir_distance.py 2> ~/log/ir_distance-err.log 1> ~/log/ir_distance-out.log");
+        if (connected) {
+            if (isRoscoreRunning()) {
+                startAutomatOnPi();
+            } else {
+                startNewRoscore();
+                startBeepNode();
+                startAutomatOnPi();
+            }
         }
     }
 
-    public String getRobotName() {
-        return "Beep";
+    /**
+     * checks, if there is a running roscore process on the Beep
+     *
+     * @return true, if roscore is running
+     */
+    private boolean isRoscoreRunning() {
+        System.out.print("Roscore running: ");
+        if (connected) {
+            piIn.println("ps -ef | grep 'roscore' | grep -v 'grep' | wc -l");
+            try {
+                String line = piOut.readLine();
+                while (line.length() != 1) {
+                    line = piOut.readLine();
+                }
+                if (line.equals("1")) { // number of roscore
+                    // processes running
+                    System.out.println("true");
+                    return true;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        System.out.println("false");
+        return false;
+    }
+
+    /**
+     * Terminates every running roscore process and starts a new roscore. Mind,
+     * that the roscore needs some time to start up after the call of this
+     * function.
+     */
+    private void startNewRoscore() {
+        if (connected) {
+            piIn.println("pkill roscore");
+            System.out.println("Starting new Roscore");
+            piIn.println("nohup roscore 2> ~/log/roscore-err.log 1> ~/log/roscore-out.log &");
+        }
+    }
+
+    /**
+     * Starts a new _Beep node. Mind, that the node needs some time to start up after the call of this
+     * function.
+     */
+    private void startBeepNode() {
+        if (connected) {
+            System.out.println("Starting Beep-node");
+            piIn.println("nohup rosrun Beep_main_node beep.py  2> ~/log/beepNode-err.log 1> ~/log/beepNode-out.log &");
+        }
+    }
+
+    /**
+     * Stops all already running Smach automates by calling stop(). Then
+     * starts the Smach automate <code>automateFileName</code> on Beep. Will
+     * store output- and error stream to log files in <code>~/log</code> on Beep
+     *
+     * Be sure that there is a roscore running before calling this method.
+     */
+    private void startAutomatOnPi() {
+        stop(); // Stop old automate
+        piIn.println("nohup rosrun zusmoro_state_machine " + automatFileName
+                + " 2> ~/log/" + automatFileName + "-err.log 1> ~/log/"
+                + automatFileName + "-out.log &");
+        try {
+            piOut.readLine(); // command
+            piOut.readLine(); // Process ID
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

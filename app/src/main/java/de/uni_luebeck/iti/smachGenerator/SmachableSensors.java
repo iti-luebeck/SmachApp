@@ -1,75 +1,115 @@
 package de.uni_luebeck.iti.smachGenerator;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.NoSuchElementException;
 
 public class SmachableSensors extends LinkedList<ISmachableSensor> {
 
     private static final long serialVersionUID = -7460092781520543805L;
 
-
-    public ISmachableSensor getSensor(String sensorName)
-            throws NoSuchElementException {
+    /**
+     * Searches for the sensor and returns the first {@link ISmachableSensor}
+     * instance with this name.
+     *
+     * @param sensorName
+     * @return first {@link ISmachableSensor} with the specified name or
+     *         <code>null</code> if there is no sensor with this name
+     */
+    public ISmachableSensor getSensor(String sensorName) {
         for (ISmachableSensor sensor : this) {
-            if (sensor.getKey().equals(sensorName))
+            if (sensor.getName().equals(sensorName))
                 return sensor;
         }
-        throw new NoSuchElementException("Zugriff auf unbekannten Sensor "
-                + sensorName + ".");
+        return null;
     }
 
-    public LinkedList<String> getCallbacks() throws IllegalArgumentException {
-        HashMap<String, String> callbacks = new HashMap<String, String>();
+    /**
+     * Creates a list of Strings. Each representing a callback for a topic. The
+     * returned LinkedList contains all callbacks, that are needed to receive
+     * the data of all {@link ISmachableSensor}s stored in this instance. Every
+     * leaf entry will be stored in the global variable with the same name as
+     * the the name of the {@link ISmachableSensor}.
+     * <p>
+     * Example: the the topic <code>Exampletopic</code> contains two elements
+     * <code>e1, e2</code>. <code>e2</code> also contains two elements
+     * <code>e3, e4</code>. <code>e1, e3, e4</code> will be stored.
+     * <p>
+     * You can access the stored data by writing
+     * <code>global <i>sensorname</i></code> in the function that will use
+     * <code>sensorname</code> and afterwards simply use <code>sensorname</code>.
+     *
+     * @return {@link LinkedList} with the callbacks for all
+     *         {@link ISmachableSensor} stored in this instance
+     */
+    public HashSet<String> getCallbacks() {
+        HashSet<String> results = new HashSet<String>();
         for (ISmachableSensor sensor : this) {
-            String cb;
-            if (callbacks.containsKey(sensor.getTopic())) {
-                cb = "\tglobal " + sensor.getKey() + "\n\t" + sensor.getKey()
-                        + " = msg." + sensor.getObjectInMessage() + "\n";
-                if (callbacks.get(sensor.getTopic()).contains(
-                        "\t" + sensor.getKey() + " = msg.")
-                        || callbacks.get(sensor.getTopic()).contains(
-                        " = msg." + sensor.getObjectInMessage() + "\n")) {
-                    throw new IllegalArgumentException(
-                            sensor.getKey()
-                                    + " is not unique. It has the same name as an other sensor or cannot be differentiated by topic and objectInMessage from an other Sensor"
-                    );
-                }
-                cb = callbacks.get(sensor.getTopic()) + cb;
-            } else {
-                cb = "def callback_" + sensor.getTopic().replace("/", "_")
-                        + "(msg):\n" + "\tglobal " + sensor.getKey() + "\n\t"
-                        + sensor.getKey() + " = msg."
-                        + sensor.getObjectInMessage() + "\n";
-
-            }
-            callbacks.put(sensor.getTopic(), cb);
-        }
-        LinkedList<String> results = new LinkedList<String>();
-        for (String cb : callbacks.values()) {
-            results.add(cb);
+            results.add(sensor.getCallback());
         }
         return results;
     }
 
+    /**
+     * Creates Strings representing the definition of all subscribers that are
+     * needed to receive the data of all {@link ISmachableSensor} stored in this
+     * instance. The name of the callback for a certain topic is "callback_
+     * <code>topic</code> ", where all "/" in <code>tobic</code> will be
+     * replaced by "_".
+     * <p>
+     * Example: the name of the callback function for the topic
+     * <code>abc/def</code> will be <code>callback_abc_def</code>.
+     *
+     * @return {@link HashSet} of subscriber definitions
+     */
     public HashSet<String> getSubscriberSetups() {
         HashSet<String> subs = new HashSet<String>();
         for (ISmachableSensor sensor : this) {
-            subs.add("rospy.Subscriber('" + sensor.getTopic() + "', "
-                    + sensor.getTopicType() + ", callback_"
-                    + sensor.getTopic().replace("/", "_") + ")\n");
+            subs.add(sensor.getSubscriberSetup());
         }
         return subs;
     }
 
+    /**
+     * Creates Strings representing all message imports that are needed to
+     * communicate with all {@link ISmachableSensor} in this instance
+     *
+     * @return {@link HashSet} of all message imports
+     */
     public HashSet<String> getMsgDeps() {
         HashSet<String> deps = new HashSet<String>();
         for (ISmachableSensor sensor : this) {
-            deps.add("from " + sensor.getTopicPackage() + " import "
-                    + sensor.getTopicType());
+            deps.addAll(sensor.getImports());
         }
         return deps;
+    }
+
+    /**
+     * returns statements for each Sensor that initializes the identifier. These
+     * "declaration" will be done global after the import statements.
+     *
+     * @return a HashSet of Identifier initializations
+     */
+    public HashSet<String> getIdentifierInit() {
+        HashSet<String> res = new HashSet<String>();
+        for (ISmachableSensor sensor : this) {
+            res.add(sensor.getIdentifierInit());
+        }
+        return res;
+    }
+
+    /**
+     * returns a HashSet of identifiers of all {@link ISmachableSensor}s stored
+     * in this List. These are used to declare the identifiers global in certain
+     * functions.
+     *
+     * @return HashSet of names of the {@link ISmachableSensor}s
+     */
+    public HashSet<String> getGlobalIdentifiers() {
+        HashSet<String> res = new HashSet<String>();
+        for (ISmachableSensor sensor : this) {
+            res.add(sensor.getGlobalIdentifier());
+        }
+        return res;
     }
 
 }

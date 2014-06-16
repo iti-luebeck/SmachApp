@@ -15,11 +15,10 @@ import com.larswerkman.holocolorpicker.ValueBar;
 
 import java.util.List;
 
-import de.uni_luebeck.iti.smachGenerator.Operator;
 import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.Action;
-import de.uni_luebeck.iti.smachapp.model.ColorActuator;
-import de.uni_luebeck.iti.smachapp.model.ColorSensor;
+import de.uni_luebeck.iti.smachapp.model.BeepColorRGBActuator;
+import de.uni_luebeck.iti.smachapp.model.BeepColorSensor;
 import de.uni_luebeck.iti.smachapp.model.Guard;
 
 /**
@@ -27,29 +26,29 @@ import de.uni_luebeck.iti.smachapp.model.Guard;
  */
 public class ColorSelector extends LinearLayout implements View.OnClickListener, ActuatorUI, SensorUI {
 
-    private ColorActuator actuator;
-    private ColorSensor sensor;
+    private BeepColorRGBActuator actuator;
+    private BeepColorSensor sensor;
     private CheckBox check;
     private Button button;
 
     private int color;
 
-    public ColorSelector(Context context, ColorActuator actuator) {
+    public ColorSelector(Context context, BeepColorRGBActuator actuator) {
         super(context);
         this.actuator = actuator;
         sensor = null;
 
         color = actuator.getDefaultColor();
-        setup(context, actuator.getKey());
+        setup(context, actuator.getName());
     }
 
-    public ColorSelector(Context context, ColorSensor sensor) {
+    public ColorSelector(Context context, BeepColorSensor sensor) {
         super(context);
         this.sensor = sensor;
         actuator = null;
 
         color = sensor.getDefaultColor();
-        setup(context, sensor.getKey());
+        setup(context, sensor.getName());
     }
 
     private void setup(Context context, String name) {
@@ -67,8 +66,8 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
 
     @Override
     public void setToAction(Action action) {
-        if (!action.getKey().equals(actuator.getKey())) {
-            throw new IllegalArgumentException("The action is not ment for this actuator.");
+        if (!action.getActuatorName().equals(actuator.getName())) {
+            throw new IllegalArgumentException("The action is not meant for this actuator.");
         }
 
         check.setChecked(true);
@@ -79,7 +78,7 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
 
     @Override
     public Action createAction() {
-        return new Action(actuator.getKey(), color);
+        return new Action(actuator.getName(), color);
     }
 
     @Override
@@ -87,7 +86,7 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
 
         List<String> names = guard.getSensorNames();
         for (int i = 0; i < names.size(); i++) {
-            if (names.get(i).equals(sensor.getKey())) {
+            if (names.get(i).equals(sensor.getName())) {
                 check.setChecked(true);
                 color = guard.getCompValues().get(i);
                 button.setBackgroundColor(color);
@@ -98,9 +97,9 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
 
     @Override
     public void fillGuard(Guard guard) {
-        guard.getSensorNames().add(sensor.getKey());
+        guard.getSensorNames().add(sensor.getName());
         guard.getCompValues().add(color);
-        guard.getOperators().add(Operator.PLACE_HOLDER);
+        guard.getOperators().add("");
     }
 
     @Override

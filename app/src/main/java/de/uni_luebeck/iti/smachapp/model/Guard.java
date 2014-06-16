@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_luebeck.iti.smachGenerator.ISmachableGuard;
-import de.uni_luebeck.iti.smachGenerator.Operator;
 
 /**
  * Created by Morten Mey on 21.04.2014.
@@ -12,7 +11,7 @@ import de.uni_luebeck.iti.smachGenerator.Operator;
 public class Guard implements ISmachableGuard {
 
     private LinkedList<String> names = new LinkedList<String>();
-    private LinkedList<Operator> operators = new LinkedList<Operator>();
+    private LinkedList<String> operators = new LinkedList<String>();
     private LinkedList<Integer> values = new LinkedList<Integer>();
 
 
@@ -22,7 +21,7 @@ public class Guard implements ISmachableGuard {
     }
 
     @Override
-    public List<Operator> getOperators() {
+    public List<String> getOperators() {
         return operators;
     }
 
@@ -31,7 +30,7 @@ public class Guard implements ISmachableGuard {
         return values;
     }
 
-    public void add(String name, Operator op, int value) {
+    public void add(String name, String op, int value) {
         names.add(name);
         operators.add(op);
         values.add(value);
@@ -47,7 +46,7 @@ public class Guard implements ISmachableGuard {
         names.set(i, name);
     }
 
-    public void updateOperator(int i, Operator op) {
+    public void updateOperator(int i, String op) {
         operators.set(i, op);
     }
 
@@ -55,7 +54,7 @@ public class Guard implements ISmachableGuard {
         values.set(i, value);
     }
 
-    public void updateAll(int i, String name, Operator op, int value) {
+    public void updateAll(int i, String name, String op, int value) {
         updateName(i, name);
         updateOperator(i, op);
         updateValue(i, value);

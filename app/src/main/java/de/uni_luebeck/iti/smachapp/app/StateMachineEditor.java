@@ -122,8 +122,6 @@ public class StateMachineEditor extends Activity {
     }
 
     public void transmit(View view) {
-        controller.compile();
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle(R.string.enterAddress);
@@ -135,7 +133,7 @@ public class StateMachineEditor extends Activity {
         builder.setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                controller.transmit(text.getText().toString());
+                controller.play(text.getText().toString());
             }
         });
 
@@ -159,7 +157,7 @@ public class StateMachineEditor extends Activity {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 dia.dismiss();
-                controller.transmit(text.getText().toString());
+                controller.play(text.getText().toString());
                 return true;
             }
         });

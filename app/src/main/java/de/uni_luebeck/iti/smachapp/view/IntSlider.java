@@ -10,29 +10,28 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import de.uni_luebeck.iti.smachGenerator.Operator;
 import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.Action;
 import de.uni_luebeck.iti.smachapp.model.Guard;
-import de.uni_luebeck.iti.smachapp.model.IntActuator;
-import de.uni_luebeck.iti.smachapp.model.IntSensor;
+import de.uni_luebeck.iti.smachapp.model.BeepMotorActuator;
+import de.uni_luebeck.iti.smachapp.model.BeepIRSensor;
 
 /**
  * Created by Morten Mey on 18.05.2014.
  */
 public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeListener, ActuatorUI, SensorUI {
 
-    private IntActuator actuator;
-    private IntSensor sensor;
+    private BeepMotorActuator actuator;
+    private BeepIRSensor sensor;
     private CheckBox check;
     private SeekBar slider;
     private TextView disp;
 
     private Spinner spinner;
-    private ArrayAdapter<Operator> adapter;
+    private ArrayAdapter<String> adapter;
 
 
-    public IntSlider(Context context, IntActuator actuator) {
+    public IntSlider(Context context, BeepMotorActuator actuator) {
         super(context);
         this.actuator = actuator;
         sensor = null;
@@ -44,9 +43,9 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
 
 
         check = new CheckBox(context);
-        check.setText(actuator.getKey());
+        check.setText(actuator.getName());
         disp = new TextView(context);
-        param = new LinearLayout.LayoutParams(60, LinearLayout.LayoutParams.WRAP_CONTENT);
+        param = new LinearLayout.LayoutParams(100, LinearLayout.LayoutParams.WRAP_CONTENT);
         disp.setLayoutParams(param);
 
         slider = new SeekBar(context);
@@ -57,10 +56,12 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         slider.setLayoutParams(param);
 
 
-        if (0 < actuator.getMax() && 0 > actuator.getMin()) {
+        if (0 <= actuator.getMax() && 0 >= actuator.getMin()) {
             slider.setProgress(-actuator.getMin());
+            disp.setText(Integer.toString(-actuator.getMin()));
         } else {
             slider.setProgress((actuator.getMax() - actuator.getMin()) / 2);
+            disp.setText(Integer.toString((actuator.getMax() - actuator.getMin()) / 2));
         }
 
         this.addView(check);
@@ -68,7 +69,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         this.addView(disp);
     }
 
-    public IntSlider(Context context, IntSensor sensor) {
+    public IntSlider(Context context, BeepIRSensor sensor) {
         super(context);
         this.sensor = sensor;
         actuator = null;
@@ -78,9 +79,9 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
 
 
         check = new CheckBox(context);
-        check.setText(sensor.getKey());
+        check.setText(sensor.getName());
         disp = new TextView(context);
-        param = new LinearLayout.LayoutParams(60, LinearLayout.LayoutParams.WRAP_CONTENT);
+        param = new LinearLayout.LayoutParams(100, LinearLayout.LayoutParams.WRAP_CONTENT);
         disp.setLayoutParams(param);
 
         slider = new SeekBar(context);
@@ -90,13 +91,13 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         param.weight = 1;
         slider.setLayoutParams(param);
 
-        adapter = new ArrayAdapter<Operator>(context, R.layout.support_simple_spinner_dropdown_item);
-        adapter.add(Operator.BIGGER);
-        adapter.add(Operator.BIGGER_EQUAL);
-        adapter.add(Operator.SMALLER);
-        adapter.add(Operator.SMALLER_EQUAL);
-        adapter.add(Operator.EQUAL);
-        adapter.add(Operator.NOT_EQUAL);
+        adapter = new ArrayAdapter<String>(context, R.layout.support_simple_spinner_dropdown_item);
+        adapter.add(">");
+        adapter.add(">=");
+        adapter.add("<");
+        adapter.add("<=");
+        adapter.add("==");
+        adapter.add("!=");
 
         spinner = new Spinner(context);
         spinner.setAdapter(adapter);
@@ -104,10 +105,12 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
         spinner.setLayoutParams(param);
 
-        if (0 < sensor.getMax() && 0 > sensor.getMin()) {
+        if (0 <= sensor.getMax() && 0 >= sensor.getMin()) {
             slider.setProgress(-sensor.getMin());
+            disp.setText(Integer.toString(-sensor.getMin()));
         } else {
             slider.setProgress((sensor.getMax() - sensor.getMin()) / 2);
+            disp.setText(Integer.toString((sensor.getMax() - sensor.getMin()) / 2));
         }
 
         this.addView(check);
@@ -119,7 +122,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
 
     @Override
     public void setToAction(Action action) {
-        if (!action.getKey().equals(actuator.getKey())) {
+        if (!action.getActuatorName().equals(actuator.getName())) {
             throw new IllegalArgumentException("The action is not for this actuator.");
         }
 
@@ -129,14 +132,14 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
 
     @Override
     public Action createAction() {
-        return new Action(actuator.getKey(), slider.getProgress() + actuator.getMin());
+        return new Action(actuator.getName(), slider.getProgress() + actuator.getMin());
     }
 
     public void setToGuard(Guard guard) {
 
         List<String> names = guard.getSensorNames();
         for (int i = 0; i < names.size(); i++) {
-            if (names.get(i).equals(sensor.getKey())) {
+            if (names.get(i).equals(sensor.getName())) {
                 check.setChecked(true);
                 slider.setProgress(guard.getCompValues().get(i) - sensor.getMin());
                 spinner.setSelection(adapter.getPosition(guard.getOperators().get(i)));
@@ -145,9 +148,9 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
     }
 
     public void fillGuard(Guard guard) {
-        guard.getSensorNames().add(sensor.getKey());
+        guard.getSensorNames().add(sensor.getName());
         guard.getCompValues().add(slider.getProgress() + sensor.getMin());
-        guard.getOperators().add((Operator) spinner.getSelectedItem());
+        guard.getOperators().add((String)spinner.getSelectedItem());
     }
 
     @Override

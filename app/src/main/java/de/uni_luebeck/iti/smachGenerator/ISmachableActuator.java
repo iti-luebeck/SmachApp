@@ -1,51 +1,55 @@
 package de.uni_luebeck.iti.smachGenerator;
 
-/**
- * An Actuator that can perform Actions.
- */
+
+import java.util.Set;
+
 public interface ISmachableActuator {
 
     /**
-     * Returns the topic to which the control messages should be posted.
-     *
-     * @return the name of the topic
+     * @return the name of the sensor
      */
-    public abstract String getTopic();
+    public abstract String getName();
 
     /**
-     * Returns the key of the Actuator.
+     * Creates the publisher setup statement. These definitions will be done
+     * globally. The name of the publisher will be the same as
+     * <code>getPublisherName()</code>.
      *
-     * @return the key
+     * @return Publisher initialization
      */
-    public abstract String getKey();
+    public abstract String getPublisherSetup();
 
     /**
-     * The name of the object in the message, for example most std_msgs use data.
-     * To create an std_msgs.Int8 message on would write in Python:
-     * <pre>
-     * {@code
-     * message=new Int8()
-     * message.data=42
-     * }
-     * </pre>
-     * Here one can see in the second line, what the object in the message is used for.
-     *
-     * @return the name of the object in the message
+     * @return the name of the publisher.
      */
-    public abstract String getObjectInMessage();
+    public abstract String getPublisherName();
 
     /**
-     * Returns the type of the topic.
+     * Creates all statements that are needed to create a ros message for this
+     * {@link ISmachableActuator} and to publish it. Add all statements in
+     * ascending oder to publish the message.
      *
-     * @return the type of the topic
+     * @param a
+     *            {@link ISmachableAction} that represents the command and the
+     *            content of the message.
+     * @return a ordered amount of statements to publish a message for this
+     *         {@link ISmachableActuator}
      */
-    public abstract String getTopicType();
+    public abstract String[] getPublishMessage(ISmachableAction a);
 
     /**
-     * Returns the package that contains the topic type.
      *
-     * @return the package of the topic type
+     * @return a HashSet of all Imports that are needed for this
+     *         {@link ISmachableActuator}.
      */
-    public abstract String getTopicPackage();
+    public abstract Set<String> getImports();
+
+
+    /**
+     * Returns a number of commands that shall be executed before the {@link SmachAutomat} is shut down.
+     * Mainly this will be publishing some last messages for the actuator to deactivate etc.
+     * @return Some commands to shutdown this actuator
+     */
+    public abstract String[] onShutDown();
 
 }
