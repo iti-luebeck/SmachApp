@@ -1,5 +1,6 @@
 package de.uni_luebeck.iti.smachapp.controller;
 
+import android.os.AsyncTask;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -173,14 +174,39 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
         SmachAutomat automat = new SmachAutomat(model.getStateMachine().getStates(), model.getRobot().getSensors(), model.getRobot().getActuators(), "zusmoro_state_machine");
         automat.saveToFile(model.getPythonFile());
 
-        try {
+        Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_LONG);
+        toast.show();
+        new NetworkTask(robot,address).execute((Void)null);
 
-            robot.connect(address);
-            robot.transmit(model.getPythonFile());
-            robot.play();
-        } catch (Exception ex) {
-            Toast toast = Toast.makeText(activity, R.string.connnectionFailure, Toast.LENGTH_LONG);
-            toast.show();
+    }
+
+    private class NetworkTask extends AsyncTask<Void,Void,Void> {
+
+        private BeepRobot robot;
+        private String address;
+
+        private NetworkTask(BeepRobot ro,String add){
+            robot=ro;
+            address=add;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+
+                robot.connect(address);
+                robot.transmit(model.getPythonFile());
+                robot.play();
+            } catch (Exception ex) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast toast = Toast.makeText(activity, R.string.connnectionFailure, Toast.LENGTH_LONG);
+                        toast.show();
+                    }
+                });
+            }
+            return null;
         }
     }
 }

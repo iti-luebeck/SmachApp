@@ -33,5 +33,6 @@
     <string name="reset_transition">Zurücksetzen</string>
     <string name="send">Senden</string>
     <string name="unconnected_transition">Unverbundene Transitionen sind nicht erlaubt.</string>
+    <string name="connecting">Verbindung wird hergestellt...</string>
 
 </resources>
