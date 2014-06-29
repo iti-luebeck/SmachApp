@@ -12,4 +12,8 @@ public interface ExtendedGestureListener extends GestureDetector.OnGestureListen
     public void onUp(MotionEvent e);
 
     boolean onContextItemSelected(MenuItem item);
+
+    void resumed();
+
+    void actionModeFinished();
 }

@@ -6,11 +6,18 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.Toast;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
+import de.uni_luebeck.iti.smachapp.model.undo.AddState;
+import de.uni_luebeck.iti.smachapp.model.undo.ChangeInitialState;
+import de.uni_luebeck.iti.smachapp.model.undo.DeleteStates;
+import de.uni_luebeck.iti.smachapp.model.undo.DragState;
+import de.uni_luebeck.iti.smachapp.model.undo.StatePropertyChanged;
 import de.uni_luebeck.iti.smachapp.utils.PointUtils;
 
 /**
@@ -29,16 +36,23 @@ public class StateController implements ExtendedGestureListener {
     private RectF rect = new RectF();
     private PointF point = new PointF();
 
-    private boolean upHandled = false;
+    private boolean isScroll = false;
+
+    private boolean isActionModeActive = false;
+    private List<State> selected = new LinkedList<State>();
 
     public StateController(StateMachineEditorController cont) {
         this.cont = cont;
     }
 
+    private DragState dragAction = null;
+    private StatePropertyChanged propertyChanged = null;
+
     @Override
     public boolean onDown(MotionEvent motionEvent) {
         dragged = null;
-        upHandled = false;
+        isScroll = false;
+        cont.getView().highlighteStates(selected);
 
         point.set(motionEvent.getX(), motionEvent.getY());
         cont.getView().translatePoint(point);
@@ -50,6 +64,7 @@ public class StateController implements ExtendedGestureListener {
                 originalPoint.set(dragged.getX(), dragged.getY());
                 lastPoint.set(originalPoint);
                 incomingTransitions = cont.getModel().getStateMachine().getIncomingTransitions(dragged);
+                dragAction = new DragState(dragged, incomingTransitions);
                 break;
             }
         }
@@ -58,39 +73,67 @@ public class StateController implements ExtendedGestureListener {
 
     @Override
     public void onUp(MotionEvent e) {
-        if (!upHandled) {
-            cont.getView().highlighteState(null);
-        }
-
-        if (dragged != null) {
+        if (isScroll) {
             for (Transition trans : dragged) {
                 trans.getPath().fixEnd();
             }
             for (Transition trans : incomingTransitions) {
                 trans.getPath().fixBeginning();
             }
+            dragAction.operationDone();
+            cont.getModel().getUndoManager().newAction(dragAction);
         }
     }
 
     @Override
     public void onShowPress(MotionEvent motionEvent) {
-        cont.getView().highlighteState(dragged);
+        selected.add(dragged);
+        cont.getView().postInvalidate();
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
-        upHandled = true;
-
-        if (dragged != null) {
-            cont.showStateProperties(dragged);
-            return true;
-        }
 
         point.x = motionEvent.getX();
         point.y = motionEvent.getY();
         cont.getView().translatePoint(point);
+
+        if (isActionModeActive) {
+
+            for (Iterator<State> iter = selected.iterator(); iter.hasNext(); ) {
+                State s = iter.next();
+                cont.getView().getStateRect(s, rect);
+                if (rect.contains(point.x, point.y)) {
+                    iter.remove();
+                    isActionModeActive = cont.updateSelection(selected.size());
+                    cont.getView().postInvalidate();
+                    return true;
+                }
+            }
+
+            for (State s : cont.getModel().getStateMachine()) {
+                cont.getView().getStateRect(s, rect);
+                if (rect.contains(point.x, point.y)) {
+                    selected.add(s);
+                    isActionModeActive = cont.updateSelection(selected.size());
+                    cont.getView().postInvalidate();
+                    return true;
+                }
+            }
+
+            return true;
+        }
+
+        if (dragged != null) {
+            propertyChanged = new StatePropertyChanged(dragged, cont.getModel().getStateMachine());
+            cont.showStateProperties(dragged);
+            return true;
+        }
+
         State s = new State(cont.getModel().getNextStateName(), point.x, point.y);
-        cont.getModel().getStateMachine().addState(s);
+        AddState action = new AddState(s, cont.getModel().getStateMachine());
+        action.redo();
+        cont.getModel().getUndoManager().newAction(action);
         cont.getView().postInvalidate();
 
         return true;
@@ -98,7 +141,11 @@ public class StateController implements ExtendedGestureListener {
 
     @Override
     public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent2, float v, float v2) {
+        if (isActionModeActive) {
+            return false;
+        }
         if (dragged != null) {
+            isScroll = true;
             point.x = motionEvent2.getX();
             point.y = motionEvent2.getY();
             cont.getView().translatePoint(point);
@@ -126,7 +173,12 @@ public class StateController implements ExtendedGestureListener {
     public void onLongPress(MotionEvent motionEvent) {
         if (dragged != null) {
             cont.showContextMenu();
-            upHandled = true;
+            isActionModeActive = true;
+            if (!selected.contains(dragged)) {
+                selected.add(dragged);
+            }
+            dragged = null;
+            cont.getView().postInvalidate();
         }
     }
 
@@ -138,35 +190,77 @@ public class StateController implements ExtendedGestureListener {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        cont.getView().highlighteState(null);
-
         switch (item.getItemId()) {
             case R.id.context_menu_delete:
-                if (dragged.isInitialState()) {
-                    Toast toast = Toast.makeText(cont.getView().getContext(), R.string.cant_delete_initial_state, Toast.LENGTH_LONG);
-                    toast.show();
-                } else {
-                    cont.getModel().getStateMachine().removeState(dragged);
+                for (Iterator<State> iter = selected.iterator(); iter.hasNext(); ) {
+                    State s = iter.next();
+                    if (s.isInitialState()) {
+                        Toast toast = Toast.makeText(cont.getView().getContext(), R.string.cant_delete_initial_state, Toast.LENGTH_LONG);
+                        toast.show();
+                        iter.remove();
+                    }
+                }
+
+                if (!selected.isEmpty()) {
+                    DeleteStates deleteAction = new DeleteStates(selected, cont.getModel().getStateMachine());
+                    deleteAction.redo();
+                    cont.getModel().getUndoManager().newAction(deleteAction);
                 }
 
                 return true;
 
             case R.id.context_menu_properties:
-                cont.showStateProperties(dragged);
+                if (selected.size() == 1) {
+                    propertyChanged = new StatePropertyChanged(selected.get(0), cont.getModel().getStateMachine());
+                    cont.showStateProperties(selected.get(0));
+                }
                 return true;
 
             case R.id.context_menu_make_initial:
-                for (State x : cont.getModel().getStateMachine()) {
-                    if (x.isInitialState()) {
-                        x.setInitialState(false);
+                if (selected.size() == 1) {
+                    State oldIinitialState = null;
+                    for (State x : cont.getModel().getStateMachine()) {
+                        if (x.isInitialState()) {
+                            oldIinitialState = x;
+                            break;
+                        }
                     }
-                }
 
-                dragged.setInitialState(true);
+                    if (oldIinitialState == selected.get(0)) {
+                        return true;
+                    }
+
+                    ChangeInitialState changeAction = new ChangeInitialState(oldIinitialState, selected.get(0), cont.getModel().getStateMachine());
+                    changeAction.redo();
+                    cont.getModel().getUndoManager().newAction(changeAction);
+
+                }
                 return true;
 
             default:
                 return false;
         }
+    }
+
+    @Override
+    public void resumed() {
+        if (propertyChanged != null) {
+
+            if (propertyChanged.operationComplete()) {
+                cont.getModel().getUndoManager().newAction(propertyChanged);
+                cont.getModel().getStateMachine().fixTransitionEnds(dragged);
+            }
+
+            dragged = null;
+            propertyChanged = null;
+            selected.clear();
+        }
+    }
+
+    @Override
+    public void actionModeFinished() {
+        isActionModeActive = false;
+        selected.clear();
+        cont.getView().postInvalidate();
     }
 }

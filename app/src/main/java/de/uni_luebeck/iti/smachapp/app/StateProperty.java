@@ -1,8 +1,8 @@
 package de.uni_luebeck.iti.smachapp.app;
 
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
@@ -10,19 +10,18 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.uni_luebeck.iti.smachapp.model.Action;
-import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.BeepColorRGBActuator;
 import de.uni_luebeck.iti.smachapp.model.BeepMotorActuator;
+import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.view.ActuatorUI;
 import de.uni_luebeck.iti.smachapp.view.ColorSelector;
 import de.uni_luebeck.iti.smachapp.view.IntSlider;
 
 
-public class StateProperty extends ActionBarActivity {
+public class StateProperty extends Activity {
 
     private State state;
-    private BeepRobot robot;
 
     private HashMap<String, ActuatorUI> uis = new HashMap<String, ActuatorUI>();
 
@@ -40,7 +39,7 @@ public class StateProperty extends ActionBarActivity {
         setContentView(R.layout.activity_state_property);
 
         state = setupState;
-        robot = setupRobot;
+        BeepRobot robot = setupRobot;
 
         ((EditText) findViewById(R.id.stateName)).setText(state.getName());
 

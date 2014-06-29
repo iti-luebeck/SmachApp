@@ -19,18 +19,20 @@ import de.uni_luebeck.iti.smachGenerator.SmachableSensors;
 
 public class BeepRobot {
 
-    List<BeepIRSensor> sensorsIR = new ArrayList<BeepIRSensor>();
+    public static final String NAME = "BEEP";
 
-    List<BeepColorSensor> sensorsCol = new ArrayList<BeepColorSensor>();
+    private List<BeepIRSensor> sensorsIR = new ArrayList<BeepIRSensor>();
 
-    List<BeepMotorActuator> motorActuators = new ArrayList<BeepMotorActuator>();
-    List<BeepColorRGBActuator> colorRGBActuators = new ArrayList<BeepColorRGBActuator>();
+    private List<BeepColorSensor> sensorsCol = new ArrayList<BeepColorSensor>();
 
-    Connection conn;
-    Session sess;
+    private List<BeepMotorActuator> motorActuators = new ArrayList<BeepMotorActuator>();
+    private List<BeepColorRGBActuator> colorRGBActuators = new ArrayList<BeepColorRGBActuator>();
 
-    String piDirAutomat;
-    String automatFileName;
+    private Connection conn;
+    private Session sess;
+
+    private String piDirAutomat;
+    private String automatFileName;
     private PrintWriter piIn;
     private BufferedReader piOut;
     private boolean connected;
@@ -49,7 +51,7 @@ public class BeepRobot {
         sensorsCol.add(new BeepColorSensor("UIR1", "/ground_colors", 1));
         sensorsCol.add(new BeepColorSensor("UIR2", "/ground_colors", 2));
         //beepTimer = new BeepSensorTimer("timer");
-       // smachableSensors.add(beepTimer);
+        // smachableSensors.add(beepTimer);
 
         // Define default Beep actuators
         motorActuators.add(new BeepMotorActuator("MOTOR_L", "/motor_l"));
@@ -67,6 +69,10 @@ public class BeepRobot {
         //motors.add(new BeepMotorActuator("BEEP", "/beep"));
 
         piDirAutomat = "/home/pi/ros/beep_framework/zusmoro_state_machine";
+    }
+
+    public String getRobotName() {
+        return NAME;
     }
 
     public List<BeepMotorActuator> getMotorActuators() {
@@ -174,6 +180,7 @@ public class BeepRobot {
             conn.close();
             conn = null;
         } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
@@ -194,7 +201,7 @@ public class BeepRobot {
 
     public boolean transmit(File file) {
 
-        automatFileName=file.getName();
+        automatFileName = file.getName();
 
         try {
             SCPClient client = new SCPClient(conn);
@@ -276,7 +283,7 @@ public class BeepRobot {
      * Stops all already running Smach automates by calling stop(). Then
      * starts the Smach automate <code>automateFileName</code> on Beep. Will
      * store output- and error stream to log files in <code>~/log</code> on Beep
-     *
+     * <p/>
      * Be sure that there is a roscore running before calling this method.
      */
     private void startAutomatOnPi() {

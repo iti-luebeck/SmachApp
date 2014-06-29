@@ -32,4 +32,15 @@ public class Action implements ISmachableAction {
     public void setValue(int value) {
         this.value = value;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Action)) {
+            return false;
+        }
+
+        Action a = (Action) other;
+
+        return a.getValue() == value && a.getActuatorName().equals(actuatorName);
+    }
 }

@@ -11,7 +11,6 @@ import java.util.NoSuchElementException;
 /**
  * Creates the python Source-Code for a Smach state machine for ROS (Robot
  * Operation System) It can be stored to a file.
- *
  */
 public class SmachAutomat {
 
@@ -25,26 +24,20 @@ public class SmachAutomat {
     /**
      * Constructs a Smach state machine form the given states
      *
-     * @param states
-     *            used to create the state machine
-     * @param sensors
-     *            containing all {@link ISmachableSensor}s that are used in the
-     *            {@link ISmachableTransition}s
-     * @param actuators
-     *            containing all {@link ISmachableActuator}s that are used in
-     *            the {@link ISmachableState}s
-     * @param pkg
-     *            the package the state machine is stored in, to load the right
-     *            manifest
-     *
-     * @throws NoSuchElementException
-     *             if sensors are used that are not specified in the
-     *             {@link SmachableSensors} object.
+     * @param states    used to create the state machine
+     * @param sensors   containing all {@link ISmachableSensor}s that are used in the
+     *                  {@link ISmachableTransition}s
+     * @param actuators containing all {@link ISmachableActuator}s that are used in
+     *                  the {@link ISmachableState}s
+     * @param pkg       the package the state machine is stored in, to load the right
+     *                  manifest
+     * @throws NoSuchElementException if sensors are used that are not specified in the
+     *                                {@link SmachableSensors} object.
      */
     public SmachAutomat(List<? extends ISmachableState> states,
                         SmachableSensors sensors, SmachableActuators actuators, String pkg)
             throws NoSuchElementException {
-            this.states = states;
+        this.states = states;
         this.sensors = sensors;
         this.actuators = actuators;
         this.pkg = pkg;
@@ -76,8 +69,7 @@ public class SmachAutomat {
     /**
      * Rewrites the ISmachableState s to a Smach state
      *
-     * @param s
-     *            ISmachableState that will be converted to a smach state
+     * @param s ISmachableState that will be converted to a smach state
      * @throws NoSuchElementException
      */
     private String getSmachState(ISmachableState s)
@@ -148,7 +140,8 @@ public class SmachAutomat {
                         } else {
                             throw new NoSuchElementException(
                                     "Zugriff auf unbekannten Sensor: "
-                                            + guard.getSensorNames().get(i));
+                                            + guard.getSensorNames().get(i)
+                            );
                         }
                     }
                 }
@@ -163,8 +156,7 @@ public class SmachAutomat {
     /**
      * create the smachMachine
      *
-     * @param sm
-     *            the identifier of the state machine
+     * @param sm the identifier of the state machine
      * @return
      */
     private String getSmachStateMachine(String sm) {
@@ -232,13 +224,11 @@ public class SmachAutomat {
      * Stores the smach automat as an executable python-program to the given
      * filename
      *
-     * @param file
-     *            the python-programm will be stored in.
+     * @param file the python-programm will be stored in.
      * @return true, if constructing and saving was successfully. False if there
-     *         were problems with Topics, names, or the saving progress.
-     * @throws NoSuchElementException
-     *             if there are no states in the states handed over in the
-     *             constructor
+     * were problems with Topics, names, or the saving progress.
+     * @throws NoSuchElementException if there are no states in the states handed over in the
+     *                                constructor
      */
     public boolean saveToFile(File file) throws NoSuchElementException {
         if (states.size() == 0) {

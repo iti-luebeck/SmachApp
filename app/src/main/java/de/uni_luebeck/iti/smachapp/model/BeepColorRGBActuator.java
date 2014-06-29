@@ -25,9 +25,9 @@ public class BeepColorRGBActuator implements ISmachableActuator {
         this.ledIndex = ledIndex;
     }
 
-    public BeepColorRGBActuator(String name, String topic, int ledIndex,int defaultColor) {
-        this(name,topic,ledIndex);
-        this.defaultColor=defaultColor;
+    public BeepColorRGBActuator(String name, String topic, int ledIndex, int defaultColor) {
+        this(name, topic, ledIndex);
+        this.defaultColor = defaultColor;
     }
 
     @Override

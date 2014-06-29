@@ -10,11 +10,10 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.Action;
-import de.uni_luebeck.iti.smachapp.model.Guard;
-import de.uni_luebeck.iti.smachapp.model.BeepMotorActuator;
 import de.uni_luebeck.iti.smachapp.model.BeepIRSensor;
+import de.uni_luebeck.iti.smachapp.model.BeepMotorActuator;
+import de.uni_luebeck.iti.smachapp.model.Guard;
 
 /**
  * Created by Morten Mey on 18.05.2014.
@@ -91,7 +90,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         param.weight = 1;
         slider.setLayoutParams(param);
 
-        adapter = new ArrayAdapter<String>(context, R.layout.support_simple_spinner_dropdown_item);
+        adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item);
         adapter.add(">");
         adapter.add(">=");
         adapter.add("<");
@@ -150,7 +149,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
     public void fillGuard(Guard guard) {
         guard.getSensorNames().add(sensor.getName());
         guard.getCompValues().add(slider.getProgress() + sensor.getMin());
-        guard.getOperators().add((String)spinner.getSelectedItem());
+        guard.getOperators().add((String) spinner.getSelectedItem());
     }
 
     @Override

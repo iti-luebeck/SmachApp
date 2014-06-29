@@ -14,6 +14,11 @@ import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.BezierPath;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
+import de.uni_luebeck.iti.smachapp.model.undo.AddTransition;
+import de.uni_luebeck.iti.smachapp.model.undo.DeleteTransitions;
+import de.uni_luebeck.iti.smachapp.model.undo.DragTransition;
+import de.uni_luebeck.iti.smachapp.model.undo.ResetTransitions;
+import de.uni_luebeck.iti.smachapp.model.undo.TransitionPropertyChanged;
 import de.uni_luebeck.iti.smachapp.utils.PointUtils;
 import de.uni_luebeck.iti.smachapp.utils.RectUtils;
 
@@ -38,6 +43,12 @@ public class TransitionController implements ExtendedGestureListener {
     private PointF originalPoint = new PointF();
     private PointF lastPoint = new PointF();
 
+    private boolean isActionModeActive = false;
+    private List<Transition> selectedTransition = new LinkedList<Transition>();
+
+    private DragTransition dragAction = null;
+    private TransitionPropertyChanged propertyAction = null;
+
     public TransitionController(StateMachineEditorController cont) {
         this.cont = cont;
     }
@@ -50,6 +61,12 @@ public class TransitionController implements ExtendedGestureListener {
         points.clear();
         isLongPress = false;
         isScroll = false;
+        cont.getView().highlighteTransitions(selectedTransition);
+
+        if (!isActionModeActive) {
+            selectedTransition.clear();
+        }
+
 
         PointF point = new PointF(motionEvent.getX(), motionEvent.getY());
         cont.getView().translatePoint(point);
@@ -76,6 +93,7 @@ public class TransitionController implements ExtendedGestureListener {
                 if (dist < minDistance) {
                     minDistance = dist;
                     selected = trans;
+                    dragAction = new DragTransition(selected);
                     lastPoint.set(point);
                     originalPoint.set(curr);
 
@@ -106,7 +124,6 @@ public class TransitionController implements ExtendedGestureListener {
         if (isLongPress) {
             return;
         }
-        cont.getView().highlighteTransition(null);
 
         if (begin != null && isScroll) {
             State end = null;
@@ -139,7 +156,9 @@ public class TransitionController implements ExtendedGestureListener {
                 BezierPath.filterPoints(points);
 
                 Transition newTrans = new Transition(begin, end, cont.getModel().getNextTransitionName(), new BezierPath(points));
-                cont.getModel().getStateMachine().addTransition(newTrans);
+                AddTransition addAction = new AddTransition(newTrans, cont.getModel().getStateMachine());
+                addAction.redo();
+                cont.getModel().getUndoManager().newAction(addAction);
             }
         } else if (selected != null && isScroll) {
 
@@ -164,9 +183,11 @@ public class TransitionController implements ExtendedGestureListener {
                     }
                 }
                 if (!connected) {
-                    selected.getPath().getPoints().get(0).set(originalPoint);
+                    dragAction.undo();
+                    dragAction = null;
                     Toast toast = Toast.makeText(cont.getView().getContext(), R.string.unconnected_transition, Toast.LENGTH_LONG);
                     toast.show();
+                    return;
                 }
 
             } else if (closestPoint == selected.getPath().getPoints().size() - 1) {
@@ -183,25 +204,79 @@ public class TransitionController implements ExtendedGestureListener {
                     }
                 }
                 if (!connected) {
-                    selected.getPath().getPoints().get(selected.getPath().getPoints().size() - 1).set(originalPoint);
+                    dragAction.undo();
+                    dragAction = null;
                     Toast toast = Toast.makeText(cont.getView().getContext(), R.string.unconnected_transition, Toast.LENGTH_LONG);
                     toast.show();
+                    return;
                 }
             }
 
             selected.getPath().fixBeginning();
             selected.getPath().fixEnd();
+
+            dragAction.operationDone();
+            cont.getModel().getUndoManager().newAction(dragAction);
+            dragAction = null;
         }
     }
 
     @Override
     public void onShowPress(MotionEvent motionEvent) {
-        cont.getView().highlighteTransition(selected);
+        selectedTransition.add(selected);
+        cont.getView().postInvalidate();
     }
 
     @Override
     public boolean onSingleTapUp(MotionEvent motionEvent) {
+        if (isActionModeActive) {
+            PointF point = new PointF(motionEvent.getX(), motionEvent.getY());
+            cont.getView().translatePoint(point);
+
+            float minDistance = BezierPath.MIN_DISTANCE;
+            for (Transition trans : cont.getModel().getStateMachine().getTransitions()) {
+                List<PointF> transPoints = trans.getPath().getPoints();
+                for (int i = 0; i < transPoints.size() - 1; i++) {
+                    PointF curr = transPoints.get(i);
+                    float dist = PointUtils.distance(curr, point);
+
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        selected = trans;
+                        lastPoint.set(point);
+                        originalPoint.set(curr);
+
+                        closestPoint = i;
+
+                        if (i + 1 < transPoints.size()) {
+                            PointF nextPoint = transPoints.get(i + 1);
+
+                            float secondDist = PointUtils.distance(nextPoint, point);
+                            if (dist > secondDist) {
+                                closestPoint = i + 1;
+                                originalPoint.set(nextPoint);
+                                minDistance = secondDist;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            if (selected == null) {
+                return false;
+            } else if (selectedTransition.contains(selected)) {
+                selectedTransition.remove(selected);
+            } else {
+                selectedTransition.add(selected);
+            }
+            cont.getView().postInvalidate();
+            cont.updateSelection(selectedTransition.size());
+            return true;
+        }
         if (selected != null) {
+            propertyAction = new TransitionPropertyChanged(selected);
             cont.showTransitionProperties(selected);
             return true;
         }
@@ -210,6 +285,10 @@ public class TransitionController implements ExtendedGestureListener {
 
     @Override
     public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent2, float v, float v2) {
+
+        if (isActionModeActive) {
+            return false;
+        }
 
         isScroll = true;
         PointF point = new PointF(motionEvent2.getX(), motionEvent2.getY());
@@ -239,6 +318,10 @@ public class TransitionController implements ExtendedGestureListener {
         if (selected != null) {
             isLongPress = true;
             cont.showContextMenu();
+            isActionModeActive = true;
+            if (!selectedTransition.contains(selected)) {
+                selectedTransition.add(selected);
+            }
         }
     }
 
@@ -249,23 +332,47 @@ public class TransitionController implements ExtendedGestureListener {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        cont.getView().highlighteTransition(null);
+
         switch (item.getItemId()) {
             case R.id.context_menu_delete:
-                cont.getModel().getStateMachine().removeTransition(selected);
+                DeleteTransitions deleteAction = new DeleteTransitions(selectedTransition, cont.getModel().getStateMachine());
+                deleteAction.redo();
+                cont.getModel().getUndoManager().newAction(deleteAction);
                 return true;
 
             case R.id.context_menu_reset:
-                selected.getPath().reset();
+                ResetTransitions resetAction = new ResetTransitions(selectedTransition);
+                resetAction.redo();
+                cont.getModel().getUndoManager().newAction(resetAction);
                 return true;
 
             case R.id.context_menu_properties:
-                cont.showTransitionProperties(selected);
+                if (selectedTransition.size() == 1) {
+                    propertyAction = new TransitionPropertyChanged(selectedTransition.get(0));
+                    cont.showTransitionProperties(selectedTransition.get(0));
+                }
                 return true;
 
             default:
                 return false;
         }
+    }
+
+    @Override
+    public void resumed() {
+        if (propertyAction != null) {
+            if (propertyAction.operationDone()) {
+                cont.getModel().getUndoManager().newAction(propertyAction);
+            }
+            propertyAction = null;
+        }
+    }
+
+    @Override
+    public void actionModeFinished() {
+        isActionModeActive = false;
+        selectedTransition.clear();
+        cont.getView().postInvalidate();
     }
 
 }

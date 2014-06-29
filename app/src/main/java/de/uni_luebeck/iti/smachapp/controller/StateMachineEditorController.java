@@ -1,12 +1,17 @@
 package de.uni_luebeck.iti.smachapp.controller;
 
 import android.os.AsyncTask;
+import android.view.ActionMode;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Toast;
+
+import java.io.IOException;
 
 import de.uni_luebeck.iti.smachGenerator.SmachAutomat;
 import de.uni_luebeck.iti.smachapp.app.R;
@@ -15,6 +20,7 @@ import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
+import de.uni_luebeck.iti.smachapp.model.XMLSaverLoader;
 import de.uni_luebeck.iti.smachapp.view.StateMachineView;
 
 /**
@@ -31,6 +37,7 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
     private ScaleGestureDetector scaleDetector;
 
     private boolean isMulitTouch = false;
+    private ActionMode actionMode = null;
 
     public StateMachineEditorController(EditorModel model, StateMachineView view, StateMachineEditor activity) {
         this.model = model;
@@ -133,12 +140,72 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
 
     }
 
-    public boolean onContextItemSelected(MenuItem item) {
-        return subController.onContextItemSelected(item);
+    public void showContextMenu() {
+        actionMode = activity.startActionMode(new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.action_mode, menu);
+
+                switch (model.getCurrentState()) {
+                    case EDIT_STATES:
+                        mode.getMenu().findItem(R.id.context_menu_reset).setVisible(false);
+                        break;
+
+                    case EDIT_TRANSITIONS:
+                        mode.getMenu().findItem(R.id.context_menu_make_initial).setVisible(false);
+                        break;
+                }
+
+                return true;
+
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem menuItem) {
+                boolean res = subController.onContextItemSelected(menuItem);
+                actionMode.finish();
+                return res;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                subController.actionModeFinished();
+                actionMode = null;
+            }
+        });
     }
 
-    public void showContextMenu() {
-        activity.openContextMenu(view);
+    public boolean updateSelection(int selectionSize) {
+        if (actionMode == null) {
+            return false;
+        }
+
+
+        if (selectionSize == 0) {
+            actionMode.finish();
+            return false;
+        } else if (selectionSize > 1) {
+            actionMode.getMenu().findItem(R.id.context_menu_make_initial).setVisible(false);
+            actionMode.getMenu().findItem(R.id.context_menu_properties).setVisible(false);
+            return true;
+
+        } else {
+            switch (model.getCurrentState()) {
+                case EDIT_STATES:
+                    actionMode.getMenu().findItem(R.id.context_menu_make_initial).setVisible(true);
+                    //falls through
+                case EDIT_TRANSITIONS:
+                    actionMode.getMenu().findItem(R.id.context_menu_properties).setVisible(true);
+                    break;
+            }
+            return true;
+        }
     }
 
     @Override
@@ -170,24 +237,36 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
 
     public void play(String address) {
         BeepRobot robot = model.getRobot();
-
+        XMLSaverLoader.PATH.mkdirs();
         SmachAutomat automat = new SmachAutomat(model.getStateMachine().getStates(), model.getRobot().getSensors(), model.getRobot().getActuators(), "zusmoro_state_machine");
         automat.saveToFile(model.getPythonFile());
 
         Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_LONG);
         toast.show();
-        new NetworkTask(robot,address).execute((Void)null);
+        new NetworkTask(robot, address).execute((Void) null);
 
     }
 
-    private class NetworkTask extends AsyncTask<Void,Void,Void> {
+    public void resumed() {
+        subController.resumed();
+    }
+
+    public void save() {
+        try {
+            XMLSaverLoader.save(model);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private class NetworkTask extends AsyncTask<Void, Void, Void> {
 
         private BeepRobot robot;
         private String address;
 
-        private NetworkTask(BeepRobot ro,String add){
-            robot=ro;
-            address=add;
+        private NetworkTask(BeepRobot ro, String add) {
+            robot = ro;
+            address = add;
         }
 
         @Override

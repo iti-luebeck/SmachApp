@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_play"
+        android:icon="@drawable/ic_action_play"
+        android:title="@string/transmitButton"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_undo"
+        android:icon="@drawable/ic_action_undo"
+        android:title="@string/undo"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_redo"
+        android:icon="@drawable/ic_action_redo"
+        android:title="@string/redo"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_center"
+        android:icon="@drawable/ic_action_center"
+        android:title="@string/reset_view"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_properties"
+        android:title="@string/properties"
+        android:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/settings"
+        android:showAsAction="never" />
+
+</menu>

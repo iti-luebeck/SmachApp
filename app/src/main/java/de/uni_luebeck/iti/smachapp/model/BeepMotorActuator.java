@@ -30,9 +30,8 @@ public class BeepMotorActuator implements ISmachableActuator {
 
     @Override
     public String getPublisherSetup() {
-        String pub = getPublisherName() + " = rospy.Publisher('" + topic
+        return getPublisherName() + " = rospy.Publisher('" + topic
                 + "', " + topicType + ")";
-        return pub;
     }
 
     @Override

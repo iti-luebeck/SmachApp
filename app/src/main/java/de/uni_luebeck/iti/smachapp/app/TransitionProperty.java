@@ -1,25 +1,24 @@
 package de.uni_luebeck.iti.smachapp.app;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import java.util.HashMap;
 
-import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.BeepColorSensor;
 import de.uni_luebeck.iti.smachapp.model.BeepIRSensor;
+import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.Transition;
 import de.uni_luebeck.iti.smachapp.view.ColorSelector;
 import de.uni_luebeck.iti.smachapp.view.IntSlider;
 import de.uni_luebeck.iti.smachapp.view.SensorUI;
 
 
-public class TransitionProperty extends ActionBarActivity {
+public class TransitionProperty extends Activity {
 
     private Transition transition;
-    private BeepRobot robot;
 
     private HashMap<String, SensorUI> uis = new HashMap<String, SensorUI>();
 
@@ -37,9 +36,9 @@ public class TransitionProperty extends ActionBarActivity {
         setContentView(R.layout.activity_transition_property);
 
         transition = setupTransition;
-        robot = setupRobot;
+        BeepRobot robot = setupRobot;
 
-        ((EditText) findViewById(R.id.transitionName)).setText(transition.getName());
+        ((EditText) findViewById(R.id.transitionName)).setText(transition.getLabel());
 
         LinearLayout container = (LinearLayout) findViewById(R.id.sensorContainer);
 
@@ -65,7 +64,7 @@ public class TransitionProperty extends ActionBarActivity {
         String newName = ((EditText) findViewById(R.id.transitionName)).getText().toString();
 
         if (!newName.isEmpty()) {
-            transition.setName(newName);
+            transition.setLabel(newName);
         }
 
         transition.getSmachableGuard().clear();

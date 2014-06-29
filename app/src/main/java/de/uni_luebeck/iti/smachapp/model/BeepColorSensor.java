@@ -19,13 +19,13 @@ public class BeepColorSensor implements ISmachableSensor {
     private final int sensorIndex;
 
     public BeepColorSensor(String name, String topic, int index) {
-        this.name=name;
-        this.topic=topic;
-        this.sensorIndex=index;
+        this.name = name;
+        this.topic = topic;
+        this.sensorIndex = index;
     }
 
     public BeepColorSensor(String name, String topic, int index, int defaultColor) {
-        this(name,topic,index);
+        this(name, topic, index);
         this.defaultColor = defaultColor;
     }
 
@@ -86,7 +86,7 @@ public class BeepColorSensor implements ISmachableSensor {
 
     @Override
     public String getTransitionCondition(String op, int compVal) {
-        float[] hsbCol = RGBtoHSB(Color.red(compVal), Color.green(compVal), Color.blue(compVal), null);
+        float[] hsbCol = RGBtoHSB(Color.red(compVal), Color.green(compVal), Color.blue(compVal));
 
         return getValueIdentifier() + ">" + (hsbCol[0] - 0.1 + 1) % 1 + " and "
                 + getValueIdentifier() + "<" + (hsbCol[0] + 0.1) % 1;
@@ -97,9 +97,9 @@ public class BeepColorSensor implements ISmachableSensor {
         return new String[0];
     }
 
-    public static float[] RGBtoHSB(int red, int green, int blue, float[] array) {
-        if (array == null)
-            array = new float[3];
+    private static float[] RGBtoHSB(int red, int green, int blue) {
+
+        float[] array = new float[3];
         // Calculate brightness.
         int min;
         int max;

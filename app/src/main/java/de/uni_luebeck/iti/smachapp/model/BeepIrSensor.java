@@ -15,19 +15,19 @@ public class BeepIRSensor implements ISmachableSensor {
     private String name;
     private String topic;
     private final int irIndex;
-    private final String topicType="beep_msgs/IR";
+    private final String topicType = "beep_msgs/IR";
 
 
     public BeepIRSensor(String name, String topic, int index, int min, int max) {
         this.min = min;
         this.max = max;
-        this.name=name;
-        this.topic=topic;
-        this.irIndex=index;
+        this.name = name;
+        this.topic = topic;
+        this.irIndex = index;
     }
 
     public BeepIRSensor(String name, String topic, int index) {
-        this(name,topic,index,0,65535);
+        this(name, topic, index, 0, 255);
     }
 
     public int getMax() {
@@ -70,10 +70,8 @@ public class BeepIRSensor implements ISmachableSensor {
 
     @Override
     public String getSubscriberSetup() {
-        String res = "";
-        res = "rospy.Subscriber('" + topic + "', " + topicType.split("/")[1]
+        return "rospy.Subscriber('" + topic + "', " + topicType.split("/")[1]
                 + ", ir_cb)\n";
-        return res;
     }
 
     @Override

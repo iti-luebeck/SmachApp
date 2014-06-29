@@ -3,30 +3,37 @@ package de.uni_luebeck.iti.smachapp.app;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.File;
 
 import de.uni_luebeck.iti.smachapp.controller.StateMachineEditorController;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
+import de.uni_luebeck.iti.smachapp.model.XMLSaverLoader;
+import de.uni_luebeck.iti.smachapp.model.undo.UndoListener;
+import de.uni_luebeck.iti.smachapp.model.undo.UndoManager;
 import de.uni_luebeck.iti.smachapp.view.StateMachineView;
 
-public class StateMachineEditor extends Activity {
+public class StateMachineEditor extends Activity implements UndoListener {
 
     private static final String USE_OLD_MODEL = "USE_OLD_EDITOR_MODEL";
+    private static final String TAB_INDEX = "TAB_INDEX";
     private static EditorModel oldModel = null;
 
     private StateMachineEditorController controller;
@@ -35,18 +42,36 @@ public class StateMachineEditor extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EditorModel model;
+        Intent intent = getIntent();
+
+        EditorModel model = null;
+        boolean restoreTabIndex = false;
 
         if (savedInstanceState != null && savedInstanceState.getBoolean(USE_OLD_MODEL, false) && oldModel != null) {
             model = oldModel;
             oldModel = null;
-        } else {
-            model = new EditorModel(getIntent().getStringExtra("name"));
+            restoreTabIndex = true;
+        } else if (intent.getStringExtra("action").equals("new")) {
+            model = new EditorModel(intent.getStringExtra("name"));
             oldModel = null;
 
             State state = new State(model.getNextStateName(), 0, 0, true);
             model.getStateMachine().addState(state);
+        } else if (intent.getStringExtra("action").equals("load")) {
+            File f = new File(intent.getData().getPath());
+            try {
+                model = XMLSaverLoader.load(f);
+            } catch (Exception e) {
+                Toast toast = Toast.makeText(this, R.string.failed_to_load, Toast.LENGTH_LONG);
+                toast.show();
+                e.printStackTrace();
+                finish();
+            }
+        } else {
+            throw new IllegalArgumentException();
         }
+
+        model.getUndoManager().addListener(this);
 
         setContentView(R.layout.activity_state_machine_editor);
 
@@ -54,16 +79,122 @@ public class StateMachineEditor extends Activity {
         registerForContextMenu(view);
 
         controller = new StateMachineEditorController(model, view, this);
+
+        ActionBar.TabListener listener = new ActionBar.TabListener() {
+            @Override
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        controller.modeSwitch(EditorModel.EditorState.EDIT_STATES);
+                        break;
+                    case 1:
+                        controller.modeSwitch(EditorModel.EditorState.EDIT_TRANSITIONS);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+            }
+
+            @Override
+            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
+            }
+        };
+
+        ActionBar bar = getActionBar();
+        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        ActionBar.Tab tab = bar.newTab().setTabListener(listener).setText(R.string.edit_states);
+        bar.addTab(tab);
+        tab = bar.newTab().setTabListener(listener).setText(R.string.edit_transitions);
+        bar.addTab(tab);
+
+        if (restoreTabIndex) {
+            bar.setSelectedNavigationItem(savedInstanceState.getInt(TAB_INDEX));
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu items for use in the action bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.editor_action_bar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean isAvail = controller.getModel().getUndoManager().isUndoAvailable();
+        MenuItem item = menu.findItem(R.id.action_undo);
+
+        item.setEnabled(isAvail);
+        if (isAvail) {
+            item.getIcon().setAlpha(255);
+        } else {
+            item.getIcon().setAlpha(77);
+        }
+
+        isAvail = controller.getModel().getUndoManager().isRedoAvailable();
+        item = menu.findItem(R.id.action_redo);
+
+        item.setEnabled(isAvail);
+        if (isAvail) {
+            item.getIcon().setAlpha(255);
+        } else {
+            item.getIcon().setAlpha(77);
+        }
+
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.action_play:
+                transmit();
+                break;
+            case R.id.action_undo:
+                controller.getModel().getUndoManager().undo();
+                controller.getView().postInvalidate();
+                break;
+            case R.id.action_redo:
+                controller.getModel().getUndoManager().redo();
+                controller.getView().postInvalidate();
+                break;
+            case R.id.action_center:
+                controller.resetView();
+                break;
+            case R.id.action_properties:
+                MachineProperty.setupModel(controller.getModel());
+                intent = new Intent(this, MachineProperty.class);
+                startActivity(intent);
+                break;
+            case R.id.action_settings:
+                intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+        }
+
+        return true;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        ActionBar bar = getActionBar();
+        getActionBar().setTitle(controller.getModel().getStateMachine().getName());
         findViewById(R.id.editorView).postInvalidate();
-        if (bar != null) {
-            bar.hide();
-        }
+        controller.resumed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        controller.save();
     }
 
     @Override
@@ -71,42 +202,7 @@ public class StateMachineEditor extends Activity {
         super.onSaveInstanceState(bundle);
         oldModel = controller.getModel();
         bundle.putBoolean(USE_OLD_MODEL, true);
-    }
-
-    public void switchModes(View view) {
-        if (view.getId() == R.id.edit_states) {
-            view.setEnabled(false);
-            controller.modeSwitch(EditorModel.EditorState.EDIT_STATES);
-            findViewById(R.id.edit_transitions).setEnabled(true);
-        } else if (view.getId() == R.id.edit_transitions) {
-            view.setEnabled(false);
-            controller.modeSwitch(EditorModel.EditorState.EDIT_TRANSITIONS);
-            findViewById(R.id.edit_states).setEnabled(true);
-        }
-    }
-
-    public void resetView(View view) {
-        controller.resetView();
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        switch (controller.getModel().getCurrentState()) {
-
-            case EDIT_STATES:
-                inflater.inflate(R.menu.context_menu_state, menu);
-                break;
-            case EDIT_TRANSITIONS:
-                inflater.inflate(R.menu.context_menu_trans, menu);
-                break;
-        }
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        return controller.onContextItemSelected(item);
+        bundle.putInt(TAB_INDEX, getActionBar().getSelectedNavigationIndex());
     }
 
     public void showStateProperties(State s) {
@@ -121,7 +217,7 @@ public class StateMachineEditor extends Activity {
         startActivity(intent);
     }
 
-    public void transmit(View view) {
+    public void transmit() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle(R.string.enterAddress);
@@ -164,4 +260,8 @@ public class StateMachineEditor extends Activity {
 
     }
 
+    @Override
+    public void operationPerformed(UndoManager manager) {
+        invalidateOptionsMenu();
+    }
 }

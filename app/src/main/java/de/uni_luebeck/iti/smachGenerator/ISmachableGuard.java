@@ -2,7 +2,7 @@ package de.uni_luebeck.iti.smachGenerator;
 
 import java.util.List;
 
-public interface ISmachableGuard{
+public interface ISmachableGuard {
 
     /**
      * Returns the name of all sensors a value shall be compared with. Returns
@@ -17,7 +17,7 @@ public interface ISmachableGuard{
      * corresponding sensor in the getSensorNames list.
      *
      * @return List of Strings, representing the relation between
-     *         sensor and compare value. Choose one of <, <=, ==, >=, >, !=
+     * sensor and compare value. Choose one of <, <=, ==, >=, >, !=
      */
     public abstract List<String> getOperators();
 

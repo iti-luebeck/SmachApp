@@ -10,14 +10,12 @@ public interface ISmachableSensor {
     public abstract String getName();
 
     /**
-     *
      * @return a HashSet of all Imports that are needed for this
-     *         {@link ISmachableSensor}.
+     * {@link ISmachableSensor}.
      */
     public abstract Set<String> getImports();
 
     /**
-     *
      * Creates the callback function for this sensor. All calculations (if
      * necessary) to be able to compare values for later transitions have to be
      * done here and the result has to be stored in the
@@ -58,25 +56,25 @@ public interface ISmachableSensor {
      * <p><i>May not be empty!</i></p>
      *
      * @return statements to define and initialize the value the callback stores
-     *         values in.
+     * values in.
      */
     public abstract String getIdentifierInit();
 
-    /** Returns the condition comparing the current sensor value with the compare
+    /**
+     * Returns the condition comparing the current sensor value with the compare
      * value.
      *
-     * @param op
-     *            Operator to compare the values. Choose one of <, <=, ==, >=, >, !=
-     * @param compVal
-     *            value to compare the current sensor value with.
+     * @param op      Operator to compare the values. Choose one of <, <=, ==, >=, >, !=
+     * @param compVal value to compare the current sensor value with.
      * @return a condition representing the comparison of the sensor value with
-     *         the compare value.
+     * the compare value.
      */
     public abstract String getTransitionCondition(String op, int compVal);
 
     /**
      * Returns a number of commands that shall be executed before the {@link SmachAutomat} is shut down.
      * Mainly this will be publishing some last messages for the sensor to deactivate etc.
+     *
      * @return Some commands to shutdown this sensor
      */
     public abstract String[] onShutDown();

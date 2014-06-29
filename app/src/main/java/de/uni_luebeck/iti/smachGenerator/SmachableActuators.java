@@ -15,9 +15,8 @@ public class SmachableActuators extends LinkedList<ISmachableActuator> {
      *
      * @param actuatorName
      * @return first {@link ISmachableActuator} with the specified name
-     * @throws NoSuchElementException
-     *             if there is no matching {@link ISmachableActuator} found in
-     *             this list.
+     * @throws NoSuchElementException if there is no matching {@link ISmachableActuator} found in
+     *                                this list.
      */
     public ISmachableActuator getActuator(String actuatorName)
             throws NoSuchElementException {
@@ -34,7 +33,7 @@ public class SmachableActuators extends LinkedList<ISmachableActuator> {
      * needed to communicate with all actuators stored in this instance. Name of
      * the publisher for a certain topic is "pub_<code>topic</code>
      * ", where all "/" in <code>tobic</code> will be replaced by "_".
-     * <p>
+     * <p/>
      * Example: to publish something on the topic <code>abc/def</code> you will
      * have to use the publisher <code>pub_abc_def</code>.
      *

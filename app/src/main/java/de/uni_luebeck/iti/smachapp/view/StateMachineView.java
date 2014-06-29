@@ -1,6 +1,7 @@
 package de.uni_luebeck.iti.smachapp.view;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,11 +10,14 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.LinkedList;
 import java.util.List;
 
+import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
@@ -43,6 +47,7 @@ public class StateMachineView extends View {
     private Paint highlightTextPaint;
     private Paint debugPaint;
     private Paint arrowPaint;
+    private Paint transitionTextPaint;
 
     private RectF rect = new RectF();
     private Rect clipBounds = new Rect();
@@ -50,13 +55,17 @@ public class StateMachineView extends View {
     private Path path = new Path();
     private Path tempPath;
 
-    private Transition highlightedTransition = null;
+    private List<Transition> highlightedTransitions = new LinkedList<Transition>();
 
-    private State highlightedState = null;
-
-    private boolean drawBezierKnots = true;
+    private List<State> highlightedStates = new LinkedList<State>();
 
     private Path arrowHead = new Path();
+
+    private static StateMachineView currentView;
+
+    public static StateMachineView getCurrentView() {
+        return currentView;
+    }
 
     public StateMachineView(Context context) {
         super(context);
@@ -74,6 +83,7 @@ public class StateMachineView extends View {
     }
 
     private void setup() {
+        currentView = this;
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(4);
@@ -85,6 +95,9 @@ public class StateMachineView extends View {
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setTextSize(40);
         textPaint.setTypeface(Typeface.DEFAULT);
+
+        transitionTextPaint = new Paint(textPaint);
+        transitionTextPaint.setTextAlign(Paint.Align.RIGHT);
 
         highlightTextPaint = new Paint(textPaint);
         highlightTextPaint.setColor(Color.BLUE);
@@ -110,6 +123,8 @@ public class StateMachineView extends View {
         canvas.translate(translationX + width, translationY + height);
         canvas.getClipBounds(clipBounds);
 
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        boolean drawTransitionNames = sharedPref.getBoolean(getContext().getString(R.string.preference_key_showTransitionNames), false);
 
         if (model == null) {
             return;
@@ -118,7 +133,7 @@ public class StateMachineView extends View {
             Paint oval, text;
 
             for (Transition trans : state) {
-                if (trans == highlightedTransition) {
+                if (highlightedTransitions.contains(trans)) {
                     oval = highlightPaint;
                 } else {
                     oval = paint;
@@ -132,6 +147,7 @@ public class StateMachineView extends View {
                 makeArrowHead(trans.getPath().calculatePointOnBezier(-1, 0.95f), points.get(points.size() - 1));
                 canvas.drawPath(arrowHead, arrowPaint);
 
+                boolean drawBezierKnots = true;
                 if (drawBezierKnots) {
                     for (PointF point : trans.getPath().getPoints()) {
                         RectUtils.makeRectFromPoint(point, rect);
@@ -139,9 +155,14 @@ public class StateMachineView extends View {
                         canvas.drawOval(rect, debugPaint);
                     }
                 }
+
+                if (drawTransitionNames) {
+                    PointF point = trans.getPath().calculatePointOnBezier((points.size() - 1) / 2, 0.5f);
+                    canvas.drawText(trans.getLabel(), point.x - 20, point.y - 20, transitionTextPaint);
+                }
             }
 
-            if (state == highlightedState) {
+            if (highlightedStates.contains(state)) {
                 oval = highlightPaint;
                 text = highlightTextPaint;
             } else {
@@ -230,13 +251,13 @@ public class StateMachineView extends View {
         point.y = point.y / scale + clipBounds.top;
     }
 
-    public void highlighteState(State s) {
-        highlightedState = s;
+    public void highlighteStates(List<State> s) {
+        highlightedStates = s;
         postInvalidate();
     }
 
-    public void highlighteTransition(Transition trans) {
-        highlightedTransition = trans;
+    public void highlighteTransitions(List<Transition> trans) {
+        highlightedTransitions = trans;
         postInvalidate();
     }
 
@@ -250,6 +271,7 @@ public class StateMachineView extends View {
         PointF dir = PointUtils.calculateDirection(endPoint, secondPoint);
         PointUtils.normalize(dir);
 
+        //noinspection SuspiciousNameCombination
         PointF first = new PointF(-dir.y, dir.x);
         PointF second = new PointF(dir.y, -dir.x);
         first.x *= 10;

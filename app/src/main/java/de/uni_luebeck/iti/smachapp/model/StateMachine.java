@@ -1,9 +1,14 @@
 package de.uni_luebeck.iti.smachapp.model;
 
+import android.graphics.PointF;
+import android.graphics.RectF;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uni_luebeck.iti.smachapp.view.StateMachineView;
 
 /**
  * A simple Finite State Machine.
@@ -35,14 +40,6 @@ public class StateMachine implements Iterable<State> {
 
     public void addState(State s) {
         states.add(s);
-    }
-
-    public State getState(int i) {
-        return states.get(i);
-    }
-
-    public int getStateCount() {
-        return states.size();
     }
 
     public void removeState(State s) {
@@ -105,5 +102,35 @@ public class StateMachine implements Iterable<State> {
             }
         }
         return res;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public State getState(String stateName) {
+        for (State s : this) {
+            if (s.getName().equals(stateName)) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public void fixTransitionEnds(State s) {
+        List<Transition> trans = getIncomingTransitions(s);
+
+        RectF rect = new RectF();
+        StateMachineView.getCurrentView().getStateRect(s, rect);
+
+        for (Transition t : trans) {
+            List<PointF> points = t.getPath().getPoints();
+            BezierPath.moveOnOval(rect, points.get(points.size() - 1));
+        }
+        for (Transition t : s) {
+            List<PointF> points = t.getPath().getPoints();
+            BezierPath.moveOnOval(rect, points.get(0));
+        }
+
     }
 }

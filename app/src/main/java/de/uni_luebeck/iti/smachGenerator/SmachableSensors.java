@@ -13,7 +13,7 @@ public class SmachableSensors extends LinkedList<ISmachableSensor> {
      *
      * @param sensorName
      * @return first {@link ISmachableSensor} with the specified name or
-     *         <code>null</code> if there is no sensor with this name
+     * <code>null</code> if there is no sensor with this name
      */
     public ISmachableSensor getSensor(String sensorName) {
         for (ISmachableSensor sensor : this) {
@@ -29,17 +29,17 @@ public class SmachableSensors extends LinkedList<ISmachableSensor> {
      * the data of all {@link ISmachableSensor}s stored in this instance. Every
      * leaf entry will be stored in the global variable with the same name as
      * the the name of the {@link ISmachableSensor}.
-     * <p>
+     * <p/>
      * Example: the the topic <code>Exampletopic</code> contains two elements
      * <code>e1, e2</code>. <code>e2</code> also contains two elements
      * <code>e3, e4</code>. <code>e1, e3, e4</code> will be stored.
-     * <p>
+     * <p/>
      * You can access the stored data by writing
      * <code>global <i>sensorname</i></code> in the function that will use
      * <code>sensorname</code> and afterwards simply use <code>sensorname</code>.
      *
      * @return {@link LinkedList} with the callbacks for all
-     *         {@link ISmachableSensor} stored in this instance
+     * {@link ISmachableSensor} stored in this instance
      */
     public HashSet<String> getCallbacks() {
         HashSet<String> results = new HashSet<String>();
@@ -55,7 +55,7 @@ public class SmachableSensors extends LinkedList<ISmachableSensor> {
      * instance. The name of the callback for a certain topic is "callback_
      * <code>topic</code> ", where all "/" in <code>tobic</code> will be
      * replaced by "_".
-     * <p>
+     * <p/>
      * Example: the name of the callback function for the topic
      * <code>abc/def</code> will be <code>callback_abc_def</code>.
      *

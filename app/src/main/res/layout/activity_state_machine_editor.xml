@@ -4,44 +4,6 @@
     android:layout_height="fill_parent"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="#ff76d3ff">
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/edit_states"
-            android:id="@+id/edit_states"
-            android:onClick="switchModes"
-            android:enabled="false" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/edit_transitions"
-            android:id="@+id/edit_transitions"
-            android:layout_gravity="center_horizontal"
-            android:onClick="switchModes" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/reset_view"
-            android:id="@+id/reset_view_button"
-            android:onClick="resetView" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/transmitButton"
-            android:id="@+id/transmit_button"
-            android:layout_gravity="center_horizontal"
-            android:onClick="transmit" />
-    </LinearLayout>
-
     <view
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
