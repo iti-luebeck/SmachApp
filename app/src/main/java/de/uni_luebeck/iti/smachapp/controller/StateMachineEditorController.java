@@ -1,6 +1,5 @@
 package de.uni_luebeck.iti.smachapp.controller;
 
-import android.os.AsyncTask;
 import android.view.ActionMode;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -9,7 +8,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -67,15 +65,23 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
     }
 
     public void modeSwitch(EditorModel.EditorState state) {
-        model.setCurrentState(state);
 
-        switch (state) {
-            case EDIT_STATES:
-                subController = new StateController(this);
-                break;
-            case EDIT_TRANSITIONS:
-                subController = new TransitionController(this);
-                break;
+        if (state != model.getCurrentState()) {
+
+            if (actionMode != null) {
+                actionMode.finish();
+            }
+
+            model.setCurrentState(state);
+
+            switch (state) {
+                case EDIT_STATES:
+                    subController = new StateController(this);
+                    break;
+                case EDIT_TRANSITIONS:
+                    subController = new TransitionController(this);
+                    break;
+            }
         }
     }
 
@@ -179,6 +185,7 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
                 actionMode = null;
             }
         });
+        actionMode.setTitle("1");
     }
 
     public boolean updateSelection(int selectionSize) {
@@ -186,6 +193,7 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
             return false;
         }
 
+        actionMode.setTitle(Integer.toString(selectionSize));
 
         if (selectionSize == 0) {
             actionMode.finish();
@@ -235,18 +243,6 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
         activity.showTransitionProperites(t);
     }
 
-    public void play(String address) {
-        BeepRobot robot = model.getRobot();
-        XMLSaverLoader.PATH.mkdirs();
-        SmachAutomat automat = new SmachAutomat(model.getStateMachine().getStates(), model.getRobot().getSensors(), model.getRobot().getActuators(), "zusmoro_state_machine");
-        automat.saveToFile(model.getPythonFile());
-
-        Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_LONG);
-        toast.show();
-        new NetworkTask(robot, address).execute((Void) null);
-
-    }
-
     public void resumed() {
         subController.resumed();
     }
@@ -259,33 +255,10 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
         }
     }
 
-    private class NetworkTask extends AsyncTask<Void, Void, Void> {
-
-        private BeepRobot robot;
-        private String address;
-
-        private NetworkTask(BeepRobot ro, String add) {
-            robot = ro;
-            address = add;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            try {
-
-                robot.connect(address);
-                robot.transmit(model.getPythonFile());
-                robot.play();
-            } catch (Exception ex) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast toast = Toast.makeText(activity, R.string.connnectionFailure, Toast.LENGTH_LONG);
-                        toast.show();
-                    }
-                });
-            }
-            return null;
-        }
+    public void compile() {
+        BeepRobot robot = model.getRobot();
+        XMLSaverLoader.PATH.mkdirs();
+        SmachAutomat automat = new SmachAutomat(model.getStateMachine().getStates(), model.getRobot().getSensors(), model.getRobot().getActuators(), "zusmoro_state_machine");
+        automat.saveToFile(model.getPythonFile());
     }
 }

@@ -1,7 +1,7 @@
 package de.uni_luebeck.iti.smachapp.model.undo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Hashtable;
+import java.util.Map;
 
 import de.uni_luebeck.iti.smachapp.model.Guard;
 import de.uni_luebeck.iti.smachapp.model.Transition;
@@ -12,14 +12,23 @@ import de.uni_luebeck.iti.smachapp.model.Transition;
 public class TransitionPropertyChanged implements UndoableAction {
 
     private class GuardElement {
-        public String sensor;
         public String op;
-        public int value;
+        public Integer value;
 
-        public GuardElement(String sensor, String op, int value) {
-            this.sensor = sensor;
+        public GuardElement(String op, Integer value) {
             this.op = op;
             this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof GuardElement)) {
+                return false;
+            }
+
+            GuardElement elem = (GuardElement) other;
+
+            return op.equals(elem.op) && value.equals(elem.value);
         }
 
     }
@@ -29,8 +38,8 @@ public class TransitionPropertyChanged implements UndoableAction {
     private String oldName;
     private String newName;
 
-    private List<GuardElement> oldGuard;
-    private List<GuardElement> newGuard;
+    private Hashtable<String, GuardElement> oldGuard = new Hashtable<String, GuardElement>();
+    private Hashtable<String, GuardElement> newGuard = new Hashtable<String, GuardElement>();
 
     public TransitionPropertyChanged(Transition transition) {
         this.transition = transition;
@@ -38,9 +47,8 @@ public class TransitionPropertyChanged implements UndoableAction {
         oldName = transition.getLabel();
 
         Guard g = transition.getSmachableGuard();
-        oldGuard = new ArrayList<GuardElement>(g.getCompValues().size());
         for (int i = 0; i < g.getOperators().size(); i++) {
-            oldGuard.add(new GuardElement(g.getSensorNames().get(i), g.getOperators().get(i), g.getCompValues().get(i)));
+            oldGuard.put(g.getSensorNames().get(i), new GuardElement(g.getOperators().get(i), g.getCompValues().get(i)));
         }
     }
 
@@ -48,13 +56,20 @@ public class TransitionPropertyChanged implements UndoableAction {
 
         newName = transition.getLabel();
 
+        boolean change = !oldName.equals(newName);
+
         Guard g = transition.getSmachableGuard();
-        newGuard = new ArrayList<GuardElement>(g.getCompValues().size());
         for (int i = 0; i < g.getOperators().size(); i++) {
-            newGuard.add(new GuardElement(g.getSensorNames().get(i), g.getOperators().get(i), g.getCompValues().get(i)));
+            String key = g.getSensorNames().get(i);
+            GuardElement elem = new GuardElement(g.getOperators().get(i), g.getCompValues().get(i));
+            newGuard.put(key, elem);
+
+            if (!(oldGuard.containsKey(key) && oldGuard.get(key).equals(elem))) {
+                change = true;
+            }
         }
 
-        return true;
+        return change;
     }
 
     @Override
@@ -63,8 +78,8 @@ public class TransitionPropertyChanged implements UndoableAction {
         Guard g = transition.getSmachableGuard();
         g.clear();
 
-        for (GuardElement elem : oldGuard) {
-            g.add(elem.sensor, elem.op, elem.value);
+        for (Map.Entry<String, GuardElement> elem : oldGuard.entrySet()) {
+            g.add(elem.getKey(), elem.getValue().op, elem.getValue().value);
         }
     }
 
@@ -74,8 +89,8 @@ public class TransitionPropertyChanged implements UndoableAction {
         Guard g = transition.getSmachableGuard();
         g.clear();
 
-        for (GuardElement elem : newGuard) {
-            g.add(elem.sensor, elem.op, elem.value);
+        for (Map.Entry<String, GuardElement> elem : newGuard.entrySet()) {
+            g.add(elem.getKey(), elem.getValue().op, elem.getValue().value);
         }
 
     }

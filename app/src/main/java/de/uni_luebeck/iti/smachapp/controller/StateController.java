@@ -19,12 +19,15 @@ import de.uni_luebeck.iti.smachapp.model.undo.DeleteStates;
 import de.uni_luebeck.iti.smachapp.model.undo.DragState;
 import de.uni_luebeck.iti.smachapp.model.undo.StatePropertyChanged;
 import de.uni_luebeck.iti.smachapp.utils.PointUtils;
+import de.uni_luebeck.iti.smachapp.utils.RectUtils;
 
 /**
  * A controller for handling input, when the user is in state editing mode.
  * Created by Morten Mey on 28.04.2014.
  */
 public class StateController implements ExtendedGestureListener {
+
+    public static final float MARGIN = 25f;
 
     private StateMachineEditorController cont;
 
@@ -59,6 +62,7 @@ public class StateController implements ExtendedGestureListener {
 
         for (State s : cont.getModel().getStateMachine()) {
             cont.getView().getStateRect(s, rect);
+            RectUtils.extendRect(rect,MARGIN);
             if (rect.contains(point.x, point.y)) {
                 dragged = s;
                 originalPoint.set(dragged.getX(), dragged.getY());

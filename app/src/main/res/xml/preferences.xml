@@ -6,4 +6,7 @@
         android:title="@string/preference_title_showTransitionNames"
         android:summary="@string/preference_summary_showTransitionNames"
         android:defaultValue="false" />
+    <Preference android:title="@string/preference_title_clear_ip"
+        android:key="button"
+        android:summary="@string/preference_summary_clear_ip"/>
 </PreferenceScreen>

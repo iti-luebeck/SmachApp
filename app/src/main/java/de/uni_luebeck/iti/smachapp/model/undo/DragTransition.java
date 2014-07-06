@@ -41,7 +41,12 @@ public class DragTransition implements UndoableAction {
     @Override
     public void undo() {
         transition.setFollowerState(nextBefore);
+        State prev=transition.getPreviousState();
+        if(prev !=null){
+            prev.removeTransition(transition);
+        }
         transition.setPreviousState(prevBefore);
+        prevBefore.addTransition(transition);
         transition.getPath().getPoints().clear();
         transition.getPath().getPoints().addAll(PointUtils.copyPoints(before));
         transition.getPath().resize();
@@ -49,7 +54,12 @@ public class DragTransition implements UndoableAction {
 
     @Override
     public void redo() {
+        State prev=transition.getPreviousState();
+        if(prev !=null) {
+            prev.removeTransition(transition);
+        }
         transition.setPreviousState(prefAfter);
+        prefAfter.addTransition(transition);
         transition.setFollowerState(nextAfter);
         transition.getPath().getPoints().clear();
         transition.getPath().getPoints().addAll(PointUtils.copyPoints(after));

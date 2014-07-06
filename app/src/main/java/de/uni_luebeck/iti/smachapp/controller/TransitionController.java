@@ -40,7 +40,6 @@ public class TransitionController implements ExtendedGestureListener {
     private State begin = null;
     private Transition selected = null;
     private int closestPoint = 0;
-    private PointF originalPoint = new PointF();
     private PointF lastPoint = new PointF();
 
     private boolean isActionModeActive = false;
@@ -83,36 +82,10 @@ public class TransitionController implements ExtendedGestureListener {
             }
         }
 
-        float minDistance = BezierPath.MIN_DISTANCE;
-        for (Transition trans : cont.getModel().getStateMachine().getTransitions()) {
-            List<PointF> transPoints = trans.getPath().getPoints();
-            for (int i = 0; i < transPoints.size() - 1; i++) {
-                PointF curr = transPoints.get(i);
-                float dist = PointUtils.distance(curr, point);
+        findPickedTransition(point);
 
-                if (dist < minDistance) {
-                    minDistance = dist;
-                    selected = trans;
-                    dragAction = new DragTransition(selected);
-                    lastPoint.set(point);
-                    originalPoint.set(curr);
-
-                    closestPoint = i;
-
-                    if (i + 1 < transPoints.size()) {
-                        PointF nextPoint = transPoints.get(i + 1);
-
-                        float secondDist = PointUtils.distance(nextPoint, point);
-                        if (dist > secondDist) {
-                            closestPoint = i + 1;
-                            originalPoint.set(nextPoint);
-                            minDistance = secondDist;
-                        }
-                    }
-
-                    break;
-                }
-            }
+        if(selected!=null){
+            dragAction = new DragTransition(selected);
         }
 
         return selected != null;
@@ -233,36 +206,7 @@ public class TransitionController implements ExtendedGestureListener {
             PointF point = new PointF(motionEvent.getX(), motionEvent.getY());
             cont.getView().translatePoint(point);
 
-            float minDistance = BezierPath.MIN_DISTANCE;
-            for (Transition trans : cont.getModel().getStateMachine().getTransitions()) {
-                List<PointF> transPoints = trans.getPath().getPoints();
-                for (int i = 0; i < transPoints.size() - 1; i++) {
-                    PointF curr = transPoints.get(i);
-                    float dist = PointUtils.distance(curr, point);
-
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        selected = trans;
-                        lastPoint.set(point);
-                        originalPoint.set(curr);
-
-                        closestPoint = i;
-
-                        if (i + 1 < transPoints.size()) {
-                            PointF nextPoint = transPoints.get(i + 1);
-
-                            float secondDist = PointUtils.distance(nextPoint, point);
-                            if (dist > secondDist) {
-                                closestPoint = i + 1;
-                                originalPoint.set(nextPoint);
-                                minDistance = secondDist;
-                            }
-                        }
-
-                        break;
-                    }
-                }
-            }
+            findPickedTransition(point);
 
             if (selected == null) {
                 return false;
@@ -373,6 +317,27 @@ public class TransitionController implements ExtendedGestureListener {
         isActionModeActive = false;
         selectedTransition.clear();
         cont.getView().postInvalidate();
+    }
+
+    private void findPickedTransition(PointF point){
+        selected=null;
+        float minDistance = BezierPath.MIN_DISTANCE;
+        for (Transition trans : cont.getModel().getStateMachine().getTransitions()) {
+            List<PointF> transPoints = trans.getPath().getPoints();
+            for (int i = 0; i < transPoints.size(); i++) {
+                PointF curr = transPoints.get(i);
+                float dist = PointUtils.distance(curr, point);
+
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    selected = trans;
+                    lastPoint.set(point);
+
+                    closestPoint = i;
+                }
+            }
+        }
+
     }
 
 }

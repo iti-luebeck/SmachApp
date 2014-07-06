@@ -1,7 +1,7 @@
 package de.uni_luebeck.iti.smachapp.model.undo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Hashtable;
+import java.util.Map;
 
 import de.uni_luebeck.iti.smachapp.model.Action;
 import de.uni_luebeck.iti.smachapp.model.State;
@@ -18,38 +18,40 @@ public class StatePropertyChanged implements UndoableAction {
     private String oldName;
     private String newName;
 
-    private List<Action> oldActions;
-    private List<Action> newActions;
+    private Hashtable<String, Integer> oldActions = new Hashtable<String, Integer>();
+    private Hashtable<String, Integer> newActions = new Hashtable<String, Integer>();
 
     public StatePropertyChanged(State state, StateMachine machine) {
         this.state = state;
         this.machine = machine;
         oldName = state.getName();
-        oldActions = copyActions(state.getActions());
+        for (Action a : state.getActions()) {
+            oldActions.put(a.getActuatorName(), a.getValue());
+        }
     }
 
     public boolean operationComplete() {
         newName = state.getName();
-        newActions = copyActions(state.getActions());
 
-        return true;
-    }
+        boolean change = !newName.equals(oldName);
 
+        for (Action a : state.getActions()) {
+            newActions.put(a.getActuatorName(), a.getValue());
 
-    private List<Action> copyActions(List<Action> actions) {
-        List<Action> res = new ArrayList<Action>(actions.size());
-
-        for (Action a : actions) {
-            res.add(new Action(a.getActuatorName(), a.getValue()));
+            if(!(oldActions.containsKey(a.getActuatorName()) && oldActions.get(a.getActuatorName()).equals(a.getValue()))){
+                change=true;
+            }
         }
-        return res;
+        return change;
     }
 
     @Override
     public void undo() {
         state.setName(oldName);
         state.getActions().clear();
-        state.getActions().addAll(copyActions(oldActions));
+        for (Map.Entry<String, Integer> entry : oldActions.entrySet()) {
+            state.addAction(new Action(entry.getKey(), entry.getValue()));
+        }
         machine.fixTransitionEnds(state);
     }
 
@@ -57,7 +59,9 @@ public class StatePropertyChanged implements UndoableAction {
     public void redo() {
         state.setName(newName);
         state.getActions().clear();
-        state.getActions().addAll(copyActions(newActions));
+        for (Map.Entry<String, Integer> entry : newActions.entrySet()) {
+            state.addAction(new Action(entry.getKey(), entry.getValue()));
+        }
         machine.fixTransitionEnds(state);
     }
 }

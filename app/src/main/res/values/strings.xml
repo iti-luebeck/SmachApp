@@ -50,5 +50,12 @@
     <string name="file_already_exists_message">Ein Automat mit diesem Namen exestiert beretis. Wollen Sie ihn überschreiben?</string>
     <string name="delete_machine">Automaten Löschen</string>
     <string name="delete_machine_title">Automaten zum Löschen auswählen</string>
+    <string name="title_activity_debug_activity">Debug</string>
+    <string name="sensor_data">Sensorwerte</string>
+    <string name="debug_automat">Automat</string>
+    <string name="stop">Automat Anhalten</string>
+    <string name="preference_title_clear_ip">Entferne letzte IP</string>
+    <string name="preference_summary_clear_ip">Löscht die zuletzt benutzte IP</string>
+    <string name="ip_deleted">IP gelöscht</string>
 
 </resources>

@@ -25,7 +25,15 @@ public class BezierPath {
 
     public BezierPath(List<PointF> knots) {
         this.knots = new ArrayList<PointF>(knots);
-        int n = knots.size() - 1;
+
+        if (knots.size() == 2) {
+            PointF dir = PointUtils.calculateDirection(this.knots.get(0), this.knots.get(1));
+            dir.x /= 2;
+            dir.y /= 2;
+            this.knots.add(1, new PointF(this.knots.get(0).x + dir.x, this.knots.get(0).y + dir.y));
+        }
+
+        int n = this.knots.size() - 1;
         fx = new float[n];
         fy = new float[n];
         sx = new float[n];

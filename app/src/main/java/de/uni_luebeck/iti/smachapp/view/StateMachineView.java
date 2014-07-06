@@ -45,7 +45,7 @@ public class StateMachineView extends View {
     private Paint textPaint;
     private Paint highlightPaint;
     private Paint highlightTextPaint;
-    private Paint debugPaint;
+    private Paint transitionKnotPaint;
     private Paint arrowPaint;
     private Paint transitionTextPaint;
 
@@ -102,8 +102,8 @@ public class StateMachineView extends View {
         highlightTextPaint = new Paint(textPaint);
         highlightTextPaint.setColor(Color.BLUE);
 
-        debugPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        debugPaint.setColor(Color.RED);
+        transitionKnotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        //transitionKnotPaint.setColor(Color.RED);
 
         arrowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
@@ -147,14 +147,14 @@ public class StateMachineView extends View {
                 makeArrowHead(trans.getPath().calculatePointOnBezier(-1, 0.95f), points.get(points.size() - 1));
                 canvas.drawPath(arrowHead, arrowPaint);
 
-                boolean drawBezierKnots = true;
-                if (drawBezierKnots) {
-                    for (PointF point : trans.getPath().getPoints()) {
-                        RectUtils.makeRectFromPoint(point, rect);
-                        RectUtils.extendRect(rect, DEBUG_POINT_SIZE);
-                        canvas.drawOval(rect, debugPaint);
-                    }
+
+                for (int i = 0; i < points.size() - 1; i++) {
+                    PointF point = points.get(i);
+                    RectUtils.makeRectFromPoint(point, rect);
+                    RectUtils.extendRect(rect, DEBUG_POINT_SIZE);
+                    canvas.drawOval(rect, transitionKnotPaint);
                 }
+
 
                 if (drawTransitionNames) {
                     PointF point = trans.getPath().calculatePointOnBezier((points.size() - 1) / 2, 0.5f);
