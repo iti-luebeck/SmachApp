@@ -20,7 +20,7 @@
     <string name="colorDialogTitle">Wähle eine Farbe:</string>
     <string name="accept">Übernehmen</string>
     <string name="disrecard">Abbrechen</string>
-    <string name="transmitButton">Ausführen</string>
+    <string name="transmitButton">Automat Ausführen</string>
     <string name="enterMachineName">Wähle einen Namen:</string>
     <string name="next">Weiter</string>
     <string name="enterAddress">Addresse des Roboters:</string>

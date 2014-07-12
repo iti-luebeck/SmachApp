@@ -5,6 +5,7 @@ import android.graphics.Color;
 import java.util.HashSet;
 import java.util.Set;
 
+import beep_msgs.Color_sensors;
 import de.uni_luebeck.iti.smachGenerator.ISmachableSensor;
 
 /**
@@ -95,6 +96,16 @@ public class BeepColorSensor implements ISmachableSensor {
     @Override
     public String[] onShutDown() {
         return new String[0];
+    }
+
+    @Override
+    public String getTopic() {
+        return "/ground_colors";
+    }
+
+    @Override
+    public String getTopicType() {
+        return Color_sensors._TYPE;
     }
 
     private static float[] RGBtoHSB(int red, int green, int blue) {

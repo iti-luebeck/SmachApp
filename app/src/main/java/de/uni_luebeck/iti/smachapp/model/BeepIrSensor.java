@@ -3,6 +3,7 @@ package de.uni_luebeck.iti.smachapp.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import beep_msgs.IR;
 import de.uni_luebeck.iti.smachGenerator.ISmachableSensor;
 
 /**
@@ -97,5 +98,15 @@ public class BeepIRSensor implements ISmachableSensor {
     @Override
     public String[] onShutDown() {
         return new String[0];
+    }
+
+    @Override
+    public String getTopic() {
+        return "/IR_filtered";
+    }
+
+    @Override
+    public String getTopicType() {
+        return IR._TYPE;
     }
 }

@@ -3,6 +3,8 @@ package de.uni_luebeck.iti.smachapp.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import beep_msgs.Color;
+
 /**
  * Created by Morten Mey on 04.07.2014.
  */
@@ -17,8 +19,12 @@ public class DebugModel {
 
     private List<DebugModelObserver> observers = new LinkedList<DebugModelObserver>();
 
-    public DebugModel(EditorModel model) {
+    private boolean isRunning=false;
+    private String ip;
+
+    public DebugModel(EditorModel model,String ip) {
         this.model = model;
+        this.ip=ip;
 
         for (State s : model.getStateMachine()) {
             if (s.isInitialState()) {
@@ -52,11 +58,13 @@ public class DebugModel {
         notifyObservers();
     }
 
-    public void updateGroundColors(int[] colors) {
-        if (colors.length != 3) {
+    public void updateGroundColors(List<Color> colors) {
+        if (colors.size() != 3) {
             throw new IllegalArgumentException();
         }
-        this.groundColors = colors;
+        groundColors[0]=colorToInt(colors.get(0));
+        groundColors[1]=colorToInt(colors.get(1));
+        groundColors[2]=colorToInt(colors.get(2));
         notifyObservers();
     }
 
@@ -88,5 +96,21 @@ public class DebugModel {
 
     public int[] getGroundColors() {
         return groundColors;
+    }
+
+    public boolean isRunning(){
+        return isRunning;
+    }
+
+    public void setRunning(boolean running){
+        isRunning=running;
+    }
+
+    public String getIp(){
+        return ip;
+    }
+
+    private static int colorToInt(Color col){
+        return android.graphics.Color.argb(col.getW(),col.getR(),col.getG(),col.getB());
     }
 }

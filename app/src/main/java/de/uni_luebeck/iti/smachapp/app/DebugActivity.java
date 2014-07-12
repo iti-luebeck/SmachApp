@@ -25,9 +25,10 @@ import de.uni_luebeck.iti.smachapp.view.StateMachineView;
 /**
  * Created by Morten Mey on 04.07.2014.
  */
-public class DebugActivity extends Activity implements DebugModelObserver{
+public class DebugActivity extends Activity implements DebugModelObserver {
 
     private static String TAB_INDEX = "TAB_INDEX";
+    private static String USE_OLD_MODEL = "USE_OLD_MODEL";
 
     private StateMachineView smView;
     private SensorView sensorView;
@@ -36,11 +37,12 @@ public class DebugActivity extends Activity implements DebugModelObserver{
 
     private DebugModel model;
     private static EditorModel setupModel;
+    private static DebugModel oldModel;
 
     private ViewGroup group;
 
-    private List<State> currentState=new ArrayList<State>(1);
-    private List<Transition> lastTransition=new ArrayList<Transition>(1);
+    private List<State> currentState = new ArrayList<State>(1);
+    private List<Transition> lastTransition = new ArrayList<Transition>(1);
 
     public static void setup(EditorModel model) {
         setupModel = model;
@@ -50,16 +52,20 @@ public class DebugActivity extends Activity implements DebugModelObserver{
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
 
-        this.model = new DebugModel(setupModel);
+        if (bundle != null && bundle.getBoolean(USE_OLD_MODEL)) {
+            this.model = oldModel;
+        } else {
+            this.model = new DebugModel(setupModel,getIntent().getStringExtra(StateMachineEditor.IP));
+        }
         model.addObserver(this);
 
         controller = new DebugController(model, this);
 
-        group=new LinearLayout(this);
+        group = new LinearLayout(this);
         group.setOnTouchListener(controller);
 
-        smView=new StateMachineView(this);
-        sensorView=new SensorView(this);
+        smView = new StateMachineView(this);
+        sensorView = new SensorView(this);
         smView.setModel(model.getEditor());
         currentState.add(model.getCurrentState());
         smView.highlighteTransitions(lastTransition);
@@ -111,9 +117,14 @@ public class DebugActivity extends Activity implements DebugModelObserver{
         if (bundle != null) {
             bar.setSelectedNavigationItem(bundle.getInt(TAB_INDEX));
         }
-        //controller.play(getIntent().getStringExtra("url"),true);
 
         setContentView(group);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        controller.stop(true);
     }
 
     @Override
@@ -129,12 +140,26 @@ public class DebugActivity extends Activity implements DebugModelObserver{
         if (getNavIndex() == 1) {
             menu.findItem(R.id.action_center).setVisible(false);
         }
+        if(!model.isRunning()){
+            MenuItem item=menu.findItem(R.id.action_stop);
+
+            item.setIcon(R.drawable.ic_action_play);
+            item.setTitle(R.string.transmitButton);
+        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_stop:
+                if(model.isRunning()){
+                    controller.stop(false);
+                }else{
+                    controller.play(false);
+                }
+
+                break;
             case R.id.action_center:
                 smView.reset();
                 break;
@@ -145,6 +170,8 @@ public class DebugActivity extends Activity implements DebugModelObserver{
     @Override
     protected void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
+        oldModel = model;
+        bundle.putBoolean(USE_OLD_MODEL, true);
         bundle.putInt(TAB_INDEX, getActionBar().getSelectedNavigationIndex());
     }
 

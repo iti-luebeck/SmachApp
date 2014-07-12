@@ -11,6 +11,7 @@ import de.uni_luebeck.iti.smachapp.app.DebugActivity;
 import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.DebugModel;
+import de.uni_luebeck.iti.smachapp.model.RosNode;
 import de.uni_luebeck.iti.smachapp.view.StateMachineView;
 
 /**
@@ -27,6 +28,8 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
     private GestureDetector detector;
     private ScaleGestureDetector scaleDetector;
     private boolean switched=false;
+
+    private RosNode node;
 
     public DebugController(DebugModel model, DebugActivity activity) {
         this.model = model;
@@ -120,33 +123,36 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
         return true;
     }
 
-    public void play(String address,boolean connect) {
+    public void play(boolean connect) {
         Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_LONG);
         toast.show();
-        new NetworkTask(model.getEditor().getRobot(), address,connect).execute((Void) null);
+        new StartTask(model.getEditor().getRobot(), model.getIp()).execute(connect);
 
     }
 
-    private class NetworkTask extends AsyncTask<Void, Void, Void> {
+    public void stop(boolean disconnect){
+        new StopTask(model.getEditor().getRobot()).execute(disconnect);
+    }
+
+    private class StartTask extends AsyncTask<Boolean, Void, Void> {
 
         private BeepRobot robot;
         private String address;
-        private boolean connect;
 
-        private NetworkTask(BeepRobot ro, String add,boolean connect) {
+        private StartTask(BeepRobot ro, String add) {
             robot = ro;
             address = add;
-            this.connect=connect;
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Void doInBackground(Boolean... connect) {
             try {
-
-                if(connect) {
+                if(connect[0]) {
                     robot.connect(address);
+                    node=new RosNode(model,address);
+                    node.startNode();
+                    robot.transmit(model.getEditor().getPythonFile());
                 }
-                robot.transmit(model.getEditor().getPythonFile());
                 robot.play();
             } catch (Exception ex) {
                 activity.runOnUiThread(new Runnable() {
@@ -156,7 +162,34 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
                         toast.show();
                     }
                 });
+                ex.printStackTrace();
             }
+            return null;
+        }
+    }
+
+    private class StopTask extends AsyncTask<Boolean,Void,Void>{
+
+        private BeepRobot robot;
+
+        private StopTask(BeepRobot robot){
+            this.robot=robot;
+        }
+
+        @Override
+        protected Void doInBackground(Boolean... booleans) {
+            try{
+                robot.stop();
+
+                if(booleans[0]){
+                    node.stopNode();
+                    robot.disconnect();
+                }
+
+            }catch (Exception ex){
+                ex.printStackTrace();;
+            }
+
             return null;
         }
     }

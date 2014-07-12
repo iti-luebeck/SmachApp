@@ -36,7 +36,8 @@ public class StateMachineEditor extends Activity implements UndoListener {
 
     private static final String USE_OLD_MODEL = "USE_OLD_EDITOR_MODEL";
     private static final String TAB_INDEX = "TAB_INDEX";
-    public static final String LAST_IP="LAST_IP";
+    public static final String LAST_IP = "LAST_IP";
+    public static final String IP = "IP";
     private static EditorModel oldModel = null;
 
     private StateMachineEditorController controller;
@@ -223,7 +224,7 @@ public class StateMachineEditor extends Activity implements UndoListener {
     public void transmit() {
         controller.compile();
 
-        final SharedPreferences pref= PreferenceManager.getDefaultSharedPreferences(this);
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -235,18 +236,18 @@ public class StateMachineEditor extends Activity implements UndoListener {
         text.selectAll();
         builder.setView(text);
 
-        final Intent intent=new Intent(this,DebugActivity.class);
+        final Intent intent = new Intent(this, DebugActivity.class);
         DebugActivity.setup(controller.getModel());
-        final Activity activity=this;
+        final Activity activity = this;
 
         builder.setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                String ip=text.getText().toString();
-                SharedPreferences.Editor edit=pref.edit();
-                edit.putString(LAST_IP,ip);
+                String ip = text.getText().toString();
+                SharedPreferences.Editor edit = pref.edit();
+                edit.putString(LAST_IP, ip);
                 edit.commit();
-                intent.putExtra("url",ip);
+                intent.putExtra(IP, ip);
                 activity.startActivity(intent);
             }
         });
@@ -271,11 +272,11 @@ public class StateMachineEditor extends Activity implements UndoListener {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 dia.dismiss();
-                String ip=text.getText().toString();
-                SharedPreferences.Editor edit=pref.edit();
-                edit.putString(LAST_IP,ip);
+                String ip = text.getText().toString();
+                SharedPreferences.Editor edit = pref.edit();
+                edit.putString(LAST_IP, ip);
                 edit.commit();
-                intent.putExtra("url",ip);
+                intent.putExtra(IP, ip);
                 activity.startActivity(intent);
                 return true;
             }

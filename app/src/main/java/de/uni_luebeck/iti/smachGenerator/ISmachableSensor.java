@@ -79,4 +79,8 @@ public interface ISmachableSensor {
      */
     public abstract String[] onShutDown();
 
+    public String getTopic();
+
+    public String getTopicType();
+
 }
