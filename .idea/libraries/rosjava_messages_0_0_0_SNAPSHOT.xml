@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="rosjava_messages-0.0.0-SNAPSHOT">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/rosjava_messages-0.0.0-SNAPSHOT.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -25,10 +25,10 @@ public class RosNode extends AbstractNodeMain {
     private NodeMainExecutor executer;
     private String ip;
 
-    public RosNode(DebugModel model,String ip){
-        this.model=model;
-        this.ip=ip;
-        executer=DefaultNodeMainExecutor.newDefault();
+    public RosNode(DebugModel model, String ip) {
+        this.model = model;
+        this.ip = ip;
+        executer = DefaultNodeMainExecutor.newDefault();
     }
 
     @Override
@@ -37,9 +37,9 @@ public class RosNode extends AbstractNodeMain {
     }
 
     @Override
-    public void onStart(final ConnectedNode connectedNode){
-        for(ISmachableSensor sen:model.getEditor().getRobot().getIntSensors()){
-            Subscriber<IR> sub=connectedNode.newSubscriber(sen.getTopic(),sen.getTopicType());
+    public void onStart(final ConnectedNode connectedNode) {
+        for (ISmachableSensor sen : model.getEditor().getRobot().getIntSensors()) {
+            Subscriber<IR> sub = connectedNode.newSubscriber(sen.getTopic(), sen.getTopicType());
 
             sub.addMessageListener(new MessageListener<IR>() {
                 @Override
@@ -49,8 +49,8 @@ public class RosNode extends AbstractNodeMain {
             });
         }
 
-        for(ISmachableSensor sen:model.getEditor().getRobot().getColorSensors()){
-            Subscriber<Color_sensors> sub=connectedNode.newSubscriber(sen.getTopic(),sen.getTopicType());
+        for (ISmachableSensor sen : model.getEditor().getRobot().getColorSensors()) {
+            Subscriber<Color_sensors> sub = connectedNode.newSubscriber(sen.getTopic(), sen.getTopicType());
 
             sub.addMessageListener(new MessageListener<Color_sensors>() {
                 @Override
@@ -60,28 +60,28 @@ public class RosNode extends AbstractNodeMain {
             });
         }
 
-        Subscriber<SmachContainerStatus> sub=connectedNode.newSubscriber("/Beep_State_Server/smach/container_status",SmachContainerStatus._TYPE);
+        Subscriber<SmachContainerStatus> sub = connectedNode.newSubscriber("/Beep_State_Server/smach/container_status", SmachContainerStatus._TYPE);
 
         sub.addMessageListener(new MessageListener<SmachContainerStatus>() {
             @Override
             public void onNewMessage(SmachContainerStatus smachContainerStatus) {
-                if(smachContainerStatus.getActiveStates().size()==1){
+                if (smachContainerStatus.getActiveStates().size() == 1) {
                     model.updateCurrentState(smachContainerStatus.getActiveStates().get(0));
-                }else{
+                } else {
                     System.out.println("More then one State Active!");
                 }
             }
         });
     }
 
-    public void startNode(){
-        URI muri=URI.create(ip);
-        NodeConfiguration config=NodeConfiguration.newPublic("127.0.0.1",muri);
+    public void startNode() {
+        URI muri = URI.create(ip);
+        NodeConfiguration config = NodeConfiguration.newPublic("127.0.0.1", muri); //Node runs on 127.0.0.1, Master is at muri
         config.setNodeName("SmachAppNode");
-        executer.execute(this,config);
+        executer.execute(this, config);
     }
 
-    public void stopNode(){
+    public void stopNode() {
         executer.shutdown();
     }
 }

@@ -298,4 +298,7 @@ public class BeepRobot {
             e.printStackTrace();
         }
     }
+    public boolean isConnected(){
+        return connected;
+    }
 }

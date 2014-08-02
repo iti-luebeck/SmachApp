@@ -52,10 +52,14 @@ public class DebugActivity extends Activity implements DebugModelObserver {
     protected void onCreate(Bundle bundle) {
         super.onCreate(bundle);
 
+        boolean running;
+
         if (bundle != null && bundle.getBoolean(USE_OLD_MODEL)) {
             this.model = oldModel;
+            running=true;
         } else {
             this.model = new DebugModel(setupModel,getIntent().getStringExtra(StateMachineEditor.IP));
+            running=false;
         }
         model.addObserver(this);
 
@@ -114,8 +118,10 @@ public class DebugActivity extends Activity implements DebugModelObserver {
         tab = bar.newTab().setTabListener(listener).setText(R.string.sensor_data);
         bar.addTab(tab);
 
-        if (bundle != null) {
+        if (running) {
             bar.setSelectedNavigationItem(bundle.getInt(TAB_INDEX));
+        }else{
+            controller.play();
         }
 
         setContentView(group);
@@ -156,7 +162,7 @@ public class DebugActivity extends Activity implements DebugModelObserver {
                 if(model.isRunning()){
                     controller.stop(false);
                 }else{
-                    controller.play(false);
+                    controller.play();
                 }
 
                 break;

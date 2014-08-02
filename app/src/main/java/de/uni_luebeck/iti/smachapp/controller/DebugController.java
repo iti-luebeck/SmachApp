@@ -123,10 +123,10 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
         return true;
     }
 
-    public void play(boolean connect) {
+    public void play() {
         Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_LONG);
         toast.show();
-        new StartTask(model.getEditor().getRobot(), model.getIp()).execute(connect);
+        new StartTask(model.getEditor().getRobot(), model.getIp()).execute((Void)null);
 
     }
 
@@ -134,7 +134,7 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
         new StopTask(model.getEditor().getRobot()).execute(disconnect);
     }
 
-    private class StartTask extends AsyncTask<Boolean, Void, Void> {
+    private class StartTask extends AsyncTask<Void, Void, Void> {
 
         private BeepRobot robot;
         private String address;
@@ -145,15 +145,17 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
         }
 
         @Override
-        protected Void doInBackground(Boolean... connect) {
+        protected Void doInBackground(Void... connect) {
             try {
-                if(connect[0]) {
+                if(!robot.isConnected()) {
                     robot.connect(address);
                     node=new RosNode(model,address);
                     node.startNode();
                     robot.transmit(model.getEditor().getPythonFile());
                 }
                 robot.play();
+                model.setRunning(true);
+                activity.invalidateOptionsMenu();
             } catch (Exception ex) {
                 activity.runOnUiThread(new Runnable() {
                     @Override
@@ -180,14 +182,17 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
         protected Void doInBackground(Boolean... booleans) {
             try{
                 robot.stop();
+                model.setRunning(false);
 
                 if(booleans[0]){
                     node.stopNode();
                     robot.disconnect();
                 }
 
+                activity.invalidateOptionsMenu();
+
             }catch (Exception ex){
-                ex.printStackTrace();;
+                ex.printStackTrace();
             }
 
             return null;
