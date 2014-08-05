@@ -118,6 +118,7 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
         picker.addSaturationBar((SaturationBar) myView.findViewById(R.id.saturationbar));
         picker.addValueBar((ValueBar) myView.findViewById(R.id.valuebar));
         picker.setColor(color);
+        picker.setOldCenterColor(color);
         builder.setView(myView);
 
         builder.setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
