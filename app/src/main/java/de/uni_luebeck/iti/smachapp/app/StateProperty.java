@@ -3,8 +3,11 @@ package de.uni_luebeck.iti.smachapp.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,23 +17,27 @@ import de.uni_luebeck.iti.smachapp.model.BeepColorRGBActuator;
 import de.uni_luebeck.iti.smachapp.model.BeepMotorActuator;
 import de.uni_luebeck.iti.smachapp.model.BeepRobot;
 import de.uni_luebeck.iti.smachapp.model.State;
+import de.uni_luebeck.iti.smachapp.model.StateMachine;
 import de.uni_luebeck.iti.smachapp.view.ActuatorUI;
 import de.uni_luebeck.iti.smachapp.view.ColorSelector;
 import de.uni_luebeck.iti.smachapp.view.IntSlider;
 
 
-public class StateProperty extends Activity {
+public class StateProperty extends Activity implements TextWatcher {
 
     private State state;
+    private StateMachine machine;
 
     private HashMap<String, ActuatorUI> uis = new HashMap<String, ActuatorUI>();
 
     private static State setupState;
     private static BeepRobot setupRobot;
+    private static StateMachine setupMachine;
 
-    public static void setupState(State s, BeepRobot r) {
+    public static void setupState(State s, BeepRobot r, StateMachine m) {
         setupState = s;
         setupRobot = r;
+        setupMachine = m;
     }
 
     @Override
@@ -39,9 +46,8 @@ public class StateProperty extends Activity {
         setContentView(R.layout.activity_state_property);
 
         state = setupState;
+        machine = setupMachine;
         BeepRobot robot = setupRobot;
-
-        ((EditText) findViewById(R.id.stateName)).setText(state.getName());
 
         LinearLayout container = (LinearLayout) findViewById(R.id.actuatorContainer);
 
@@ -61,17 +67,25 @@ public class StateProperty extends Activity {
             uis.get(a.getActuatorName()).setToAction(a);
         }
 
+        EditText text=(EditText)findViewById(R.id.stateName);
+        text.setText(state.getName());
+        text.addTextChangedListener(this);
+
     }
 
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
+    public void onBackPressed() {
         String newName = ((EditText) findViewById(R.id.stateName)).getText().toString();
 
-        if (!newName.isEmpty()) {
-            state.setName(newName);
+        if (!newName.equals(state.getName())) {
+            if (machine.getState(newName) == null) {
+                state.setName(newName);
+            }else{
+                Toast toast=Toast.makeText(this,R.string.nameAlreadyExists,Toast.LENGTH_LONG);
+                toast.show();
+                return;
+            }
         }
 
         List<Action> actions = state.getActions();
@@ -82,7 +96,27 @@ public class StateProperty extends Activity {
                 actions.add(ui.createAction());
             }
         }
+
+        finish();
     }
 
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+        String name=editable.toString();
+
+        if(!name.equals(state.getName()) && machine.getState(name)!=null){
+            Toast toast=Toast.makeText(this,R.string.nameAlreadyExists,Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
 }

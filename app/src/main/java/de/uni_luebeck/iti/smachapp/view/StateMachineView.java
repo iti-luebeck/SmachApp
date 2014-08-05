@@ -48,6 +48,9 @@ public class StateMachineView extends View {
     private Paint transitionKnotPaint;
     private Paint arrowPaint;
     private Paint transitionTextPaint;
+    private Paint highlightTransitionTextPaint;
+    private Paint highlightArrowPaint;
+    private Paint highlightTransitionKnotPaint;
 
     private RectF rect = new RectF();
     private Rect clipBounds = new Rect();
@@ -99,13 +102,19 @@ public class StateMachineView extends View {
         transitionTextPaint = new Paint(textPaint);
         transitionTextPaint.setTextAlign(Paint.Align.RIGHT);
 
+        highlightTransitionTextPaint = new Paint(transitionTextPaint);
+        highlightTransitionTextPaint.setColor(Color.BLUE);
+
         highlightTextPaint = new Paint(textPaint);
         highlightTextPaint.setColor(Color.BLUE);
 
         transitionKnotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        //transitionKnotPaint.setColor(Color.RED);
+        highlightTransitionKnotPaint = new Paint(transitionKnotPaint);
+        highlightTransitionKnotPaint.setColor(Color.BLUE);
 
         arrowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        highlightArrowPaint = new Paint(arrowPaint);
+        highlightArrowPaint.setColor(Color.BLUE);
     }
 
     public void setModel(EditorModel model) {
@@ -130,13 +139,19 @@ public class StateMachineView extends View {
             return;
         }
         for (State state : model.getStateMachine()) {
-            Paint oval, text;
+            Paint oval, text, arrow, knot;
 
             for (Transition trans : state) {
                 if (highlightedTransitions.contains(trans)) {
                     oval = highlightPaint;
+                    text = highlightTransitionTextPaint;
+                    arrow = highlightArrowPaint;
+                    knot = highlightTransitionKnotPaint;
                 } else {
                     oval = paint;
+                    text = transitionTextPaint;
+                    arrow = arrowPaint;
+                    knot = transitionKnotPaint;
                 }
 
                 path.rewind();
@@ -145,20 +160,20 @@ public class StateMachineView extends View {
 
                 List<PointF> points = trans.getPath().getPoints();
                 makeArrowHead(trans.getPath().calculatePointOnBezier(-1, 0.95f), points.get(points.size() - 1));
-                canvas.drawPath(arrowHead, arrowPaint);
+                canvas.drawPath(arrowHead, arrow);
 
 
                 for (int i = 0; i < points.size() - 1; i++) {
                     PointF point = points.get(i);
                     RectUtils.makeRectFromPoint(point, rect);
                     RectUtils.extendRect(rect, DEBUG_POINT_SIZE);
-                    canvas.drawOval(rect, transitionKnotPaint);
+                    canvas.drawOval(rect, knot);
                 }
 
 
                 if (drawTransitionNames) {
                     PointF point = trans.getPath().calculatePointOnBezier((points.size() - 1) / 2, 0.5f);
-                    canvas.drawText(trans.getLabel(), point.x - 20, point.y - 20, transitionTextPaint);
+                    canvas.drawText(trans.getLabel(), point.x - 20, point.y - 20, text);
                 }
             }
 

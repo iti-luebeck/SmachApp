@@ -18,9 +18,6 @@ public class EditorModel {
 
     private StateMachine stateMachine;
 
-    private int stateNameCounter = 0;
-    private int transitionNameCounter = 0;
-
     private BeepRobot robot = new BeepRobot();
 
     private File pythonFile;
@@ -35,8 +32,8 @@ public class EditorModel {
 
     public void updateFileNames() {
         File path = XMLSaverLoader.PATH;
-        pythonFile = new File(path, stateMachine.getName() + ".py");
-        saveFile = new File(path, stateMachine.getName() + ".smach");
+        pythonFile = new File(path, stateMachine.getName() + XMLSaverLoader.PYTHON_FILE_ENDING);
+        saveFile = new File(path, stateMachine.getName() + XMLSaverLoader.FILE_ENDING);
     }
 
 
@@ -52,31 +49,30 @@ public class EditorModel {
         return stateMachine;
     }
 
-    public void setStateNameCounter(int i) {
-        stateNameCounter = i;
-    }
-
-    public int getStateNameCounter() {
-        return stateNameCounter;
-    }
 
     public String getNextStateName() {
-        String res = "S" + stateNameCounter;
-        stateNameCounter++;
+        int i=stateMachine.getStates().size();
+
+        String res="S"+i;
+
+        while(stateMachine.getState(res)!=null){
+            i++;
+            res="S"+i;
+        }
+
         return res;
     }
 
-    public void setTransitionNameCounter(int i) {
-        transitionNameCounter = i;
-    }
-
-    public int getTransitionNameCounter() {
-        return transitionNameCounter;
-    }
-
     public String getNextTransitionName() {
-        String res = "T" + transitionNameCounter;
-        transitionNameCounter++;
+        int i=stateMachine.getTransitions().size();
+
+        String res="T"+i;
+
+        while(stateMachine.getTransition(res)!=null){
+            i++;
+            res="T"+i;
+        }
+
         return res;
     }
 

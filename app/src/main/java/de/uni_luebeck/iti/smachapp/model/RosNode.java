@@ -27,7 +27,7 @@ public class RosNode extends AbstractNodeMain {
 
     public RosNode(DebugModel model, String ip) {
         this.model = model;
-        this.ip = ip;
+        this.ip = "http://"+ip+":11311/";
         executer = DefaultNodeMainExecutor.newDefault();
     }
 

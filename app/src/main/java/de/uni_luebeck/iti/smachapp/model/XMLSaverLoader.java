@@ -21,38 +21,36 @@ import java.util.List;
  */
 public class XMLSaverLoader {
 
-    public final static File PATH = new File(Environment.getExternalStorageDirectory(), "SMACH");
+    public static final File PATH = new File(Environment.getExternalStorageDirectory(), "SMACH");
+    public static final String FILE_ENDING = ".smach";
+    public static final String PYTHON_FILE_ENDING = ".py";
 
-    private final static String TAG_STATEMACHINE = "StateMachine";
-    private final static String TAG_EDITOR = "Editor";
-    private final static String TAG_STATE = "State";
-    private final static String TAG_ACTION = "Action";
-    private final static String TAG_TRANSITION = "Transition";
+    private static final String TAG_STATEMACHINE = "StateMachine";
+    private static final String TAG_STATE = "State";
+    private static final String TAG_ACTION = "Action";
+    private static final String TAG_TRANSITION = "Transition";
     private static final String TAG_GUARD = "Guard";
     private static final String TAG_GUARD_ELEM = "GuardElement";
     private static final String TAG_PATH = "Path";
     private static final String TAG_POINT = "Point";
 
-    private final static String PROP_NAME = "name";
-    private final static String PROP_ROBOT = "robot";
-    private final static String PROP_STATE_NAME_COUNT = "stateNameCount";
-    private final static String PROP_TRANSITION_NAME_COUNT = "transitionNameCount";
-    private final static String PROP_X = "x";
-    private final static String PROP_Y = "y";
-    private final static String PROP_IS_INITIAL_STATE = "isInitialState";
-    private final static String PROP_ACTUATOR = "actuator";
-    private final static String PROP_VALUE = "value";
-    private final static String PROP_PREV = "previousState";
-    private final static String PROP_NEXT = "nextState";
+    private static final String PROP_NAME = "name";
+    private static final String PROP_ROBOT = "robot";
+    private static final String PROP_X = "x";
+    private static final String PROP_Y = "y";
+    private static final String PROP_IS_INITIAL_STATE = "isInitialState";
+    private static final String PROP_ACTUATOR = "actuator";
+    private static final String PROP_VALUE = "value";
+    private static final String PROP_PREV = "previousState";
+    private static final String PROP_NEXT = "nextState";
     private static final String PROP_SENSOR = "sensor";
     private static final String PROP_OPERATOR = "operator";
-
 
     public static File[] getAllSaves() {
         return PATH.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String s) {
-                return s.endsWith(".smach");
+                return s.endsWith(FILE_ENDING);
             }
         });
     }
@@ -60,9 +58,11 @@ public class XMLSaverLoader {
     public static boolean doesFileExist(String automatName) {
         File[] files = XMLSaverLoader.getAllSaves();
 
+        String fileName = automatName + FILE_ENDING;
+
         boolean alreadyExists = false;
         for (File f : files) {
-            if (f.getName().equals(automatName + ".smach")) {
+            if (f.getName().equals(fileName)) {
                 alreadyExists = true;
                 break;
             }
@@ -80,11 +80,6 @@ public class XMLSaverLoader {
         ser.startTag(null, TAG_STATEMACHINE);
         ser.attribute(null, PROP_NAME, model.getStateMachine().getName());
         ser.attribute(null, PROP_ROBOT, model.getRobot().getRobotName());
-
-        ser.startTag(null, TAG_EDITOR);
-        ser.attribute(null, PROP_STATE_NAME_COUNT, Integer.toString(model.getStateNameCounter()));
-        ser.attribute(null, PROP_TRANSITION_NAME_COUNT, Integer.toString(model.getTransitionNameCounter()));
-        ser.endTag(null, TAG_EDITOR);
 
         for (State s : model.getStateMachine()) {
             saveState(s, ser);
@@ -177,9 +172,7 @@ public class XMLSaverLoader {
             }
             String tag = pars.getName();
             // Starts by looking for the entry tag
-            if (tag.equals(TAG_EDITOR)) {
-                loadEditor(pars, model);
-            } else if (tag.equals(TAG_STATE)) {
+            if (tag.equals(TAG_STATE)) {
                 loadState(pars, model);
             } else if (tag.equals(TAG_TRANSITION)) {
                 loadTransition(pars, model);
@@ -189,14 +182,6 @@ public class XMLSaverLoader {
         }
 
         return model;
-    }
-
-    private static void loadEditor(XmlPullParser pars, EditorModel model) throws XmlPullParserException, IOException {
-        pars.require(XmlPullParser.START_TAG, null, TAG_EDITOR);
-        model.setStateNameCounter(Integer.parseInt(pars.getAttributeValue(null, PROP_STATE_NAME_COUNT)));
-        model.setTransitionNameCounter(Integer.parseInt(pars.getAttributeValue(null, PROP_TRANSITION_NAME_COUNT)));
-        pars.nextTag();
-        pars.require(XmlPullParser.END_TAG, null, TAG_EDITOR);
     }
 
     private static void loadState(XmlPullParser pars, EditorModel model) throws XmlPullParserException, IOException {

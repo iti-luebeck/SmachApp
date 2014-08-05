@@ -133,4 +133,15 @@ public class StateMachine implements Iterable<State> {
         }
 
     }
+
+    public Transition getTransition(String name) {
+        for(State s:this){
+            for(Transition t:s){
+                if(t.getLabel().equals(name)){
+                    return t;
+                }
+            }
+        }
+        return null;
+    }
 }
