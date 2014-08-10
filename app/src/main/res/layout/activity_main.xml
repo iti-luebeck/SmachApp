@@ -2,75 +2,59 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:weightSum="2">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="2">
+        android:weightSum="2"
+        android:layout_weight="1">
 
-        <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/imageButton"
-            android:onClick="newFSM"
-            android:background="@drawable/main_menu_new"
-            android:adjustViewBounds="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@drawable/main_menu_new"
             android:layout_weight="1"
-            android:scaleType="fitCenter" />
+            android:clickable="true"
+            android:onClick="newFSM" />
 
-        <ImageButton
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/imageButton2"
-            android:onClick="load"
-            android:background="@drawable/main_menu_load"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView2"
+            android:src="@drawable/main_menu_load"
             android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter" />
-
+            android:clickable="true"
+            android:onClick="load" />
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="2">
+        android:weightSum="2"
+        android:layout_weight="1">
 
-        <ImageButton
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/imageButton3"
-            android:background="@drawable/main_menu_delete"
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView3"
             android:onClick="delete"
-            android:layout_alignParentTop="false"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentBottom="true"
+            android:src="@drawable/main_menu_delete"
             android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter" />
+            android:clickable="true" />
 
-        <ImageButton
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/imageButton4"
-            android:onClick="gotoSettings"
-            android:background="@drawable/main_menu_settings"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="false"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView4"
             android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter" />
+            android:clickable="true"
+            android:src="@drawable/main_menu_settings"
+            android:onClick="gotoSettings" />
     </LinearLayout>
+
 </LinearLayout>
