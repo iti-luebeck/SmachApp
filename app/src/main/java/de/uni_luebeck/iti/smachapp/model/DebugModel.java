@@ -60,7 +60,8 @@ public class DebugModel {
 
     public void updateGroundColors(List<Color> colors) {
         if (colors.size() != 3) {
-            throw new IllegalArgumentException();
+            //System.out.println(colors.size());
+            return;
         }
         groundColors[0]=colorToInt(colors.get(0));
         groundColors[1]=colorToInt(colors.get(1));

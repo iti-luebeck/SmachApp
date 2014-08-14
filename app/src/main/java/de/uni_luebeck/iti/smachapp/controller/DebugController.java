@@ -124,7 +124,7 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
     }
 
     public void play() {
-        Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_SHORT);
         toast.show();
         new StartTask(model.getEditor().getRobot(), model.getIp()).execute((Void)null);
 
@@ -156,6 +156,13 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
                 robot.play();
                 model.setRunning(true);
                 activity.invalidateOptionsMenu();
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast toast = Toast.makeText(activity,R.string.connectionSuccess,Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
             } catch (Exception ex) {
                 activity.runOnUiThread(new Runnable() {
                     @Override

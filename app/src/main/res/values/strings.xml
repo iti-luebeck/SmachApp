@@ -58,5 +58,6 @@
     <string name="preference_summary_clear_ip">Löscht die zuletzt benutzte IP</string>
     <string name="ip_deleted">IP gelöscht</string>
     <string name="nameAlreadyExists">Dieser Name ist bereits vergeben, er wird nicht übernommen.</string>
+    <string name="connectionSuccess">Verbindung hergestellt.</string>
 
 </resources>

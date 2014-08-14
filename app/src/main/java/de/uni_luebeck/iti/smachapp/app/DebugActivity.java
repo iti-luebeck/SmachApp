@@ -122,6 +122,7 @@ public class DebugActivity extends Activity implements DebugModelObserver {
             bar.setSelectedNavigationItem(bundle.getInt(TAB_INDEX));
         }else{
             controller.play();
+            invalidateOptionsMenu();
         }
 
         setContentView(group);
@@ -130,6 +131,7 @@ public class DebugActivity extends Activity implements DebugModelObserver {
     @Override
     protected void onDestroy(){
         super.onDestroy();
+        System.out.println("Destroying");
         controller.stop(true);
     }
 

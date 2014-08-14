@@ -1,5 +1,9 @@
 package de.uni_luebeck.iti.smachapp.model;
 
+import android.util.Log;
+
+import org.apache.http.conn.util.InetAddressUtils;
+import org.ros.address.BindAddress;
 import org.ros.message.MessageListener;
 import org.ros.namespace.GraphName;
 import org.ros.node.AbstractNodeMain;
@@ -9,7 +13,11 @@ import org.ros.node.NodeConfiguration;
 import org.ros.node.NodeMainExecutor;
 import org.ros.node.topic.Subscriber;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URI;
+import java.util.Enumeration;
 
 import beep_msgs.Color_sensors;
 import beep_msgs.IR;
@@ -74,9 +82,34 @@ public class RosNode extends AbstractNodeMain {
         });
     }
 
+    public static String getLocalIpAddress()
+    {
+        try
+        {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();)
+            {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();)
+                {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && InetAddressUtils.isIPv4Address(inetAddress.getHostAddress()))
+                    {
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        }
+        catch (SocketException ex)
+        {
+            ex.printStackTrace();
+        }
+        return "";
+    }
+
     public void startNode() {
         URI muri = URI.create(ip);
-        NodeConfiguration config = NodeConfiguration.newPublic("127.0.0.1", muri); //Node runs on 127.0.0.1, Master is at muri
+        String myIp=getLocalIpAddress();
+        NodeConfiguration config = NodeConfiguration.newPublic(myIp, muri); //Node runs on myIp, Master is at muri
         config.setNodeName("SmachAppNode");
         executer.execute(this, config);
     }
