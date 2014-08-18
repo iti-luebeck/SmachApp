@@ -239,8 +239,8 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
         activity.showStateProperties(s);
     }
 
-    public void showTransitionProperties(Transition t) {
-        activity.showTransitionProperites(t);
+    public void showTransitionProperties(Transition t, int priority, int maxPriority) {
+        activity.showTransitionProperites(t, priority, maxPriority);
     }
 
     public void resumed() {

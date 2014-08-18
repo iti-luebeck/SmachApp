@@ -211,13 +211,13 @@ public class StateMachineEditor extends Activity implements UndoListener {
 
     public void showStateProperties(State s) {
         Intent intent = new Intent(this, StateProperty.class);
-        StateProperty.setupState(s, controller.getModel().getRobot(),controller.getModel().getStateMachine());
+        StateProperty.setupState(s, controller.getModel().getRobot(), controller.getModel().getStateMachine());
         startActivity(intent);
     }
 
-    public void showTransitionProperites(Transition t) {
+    public void showTransitionProperites(Transition t, int priority, int maxPriority) {
         Intent intent = new Intent(this, TransitionProperty.class);
-        TransitionProperty.setupTransition(t, controller.getModel().getRobot(),controller.getModel().getStateMachine());
+        TransitionProperty.setupTransition(t, controller.getModel().getRobot(), controller.getModel().getStateMachine(), priority, maxPriority);
         startActivity(intent);
     }
 

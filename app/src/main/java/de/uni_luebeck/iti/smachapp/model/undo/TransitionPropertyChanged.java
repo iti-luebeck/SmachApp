@@ -1,6 +1,7 @@
 package de.uni_luebeck.iti.smachapp.model.undo;
 
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import de.uni_luebeck.iti.smachapp.model.Guard;
@@ -34,6 +35,9 @@ public class TransitionPropertyChanged implements UndoableAction {
     }
 
     private Transition transition;
+    private List<Transition> parentList;
+    private int oldPriority;
+    private int newPriority;
 
     private String oldName;
     private String newName;
@@ -41,9 +45,10 @@ public class TransitionPropertyChanged implements UndoableAction {
     private Hashtable<String, GuardElement> oldGuard = new Hashtable<String, GuardElement>();
     private Hashtable<String, GuardElement> newGuard = new Hashtable<String, GuardElement>();
 
-    public TransitionPropertyChanged(Transition transition) {
+    public TransitionPropertyChanged(Transition transition, List<Transition> parent, int priority) {
         this.transition = transition;
-
+        parentList = parent;
+        oldPriority = priority;
         oldName = transition.getLabel();
 
         Guard g = transition.getSmachableGuard();
@@ -52,8 +57,8 @@ public class TransitionPropertyChanged implements UndoableAction {
         }
     }
 
-    public boolean operationDone() {
-
+    public boolean operationDone(int priority) {
+        newPriority = priority;
         newName = transition.getLabel();
 
         boolean change = !oldName.equals(newName);
@@ -69,11 +74,15 @@ public class TransitionPropertyChanged implements UndoableAction {
             }
         }
 
-        return change;
+        return change || didPriorityChange();
     }
 
     @Override
     public void undo() {
+        if(didPriorityChange()) {
+            parentList.remove(transition);
+            parentList.add(oldPriority, transition);
+        }
         transition.setLabel(oldName);
         Guard g = transition.getSmachableGuard();
         g.clear();
@@ -85,6 +94,10 @@ public class TransitionPropertyChanged implements UndoableAction {
 
     @Override
     public void redo() {
+        if(didPriorityChange()) {
+            parentList.remove(transition);
+            parentList.add(newPriority, transition);
+        }
         transition.setLabel(newName);
         Guard g = transition.getSmachableGuard();
         g.clear();
@@ -92,6 +105,13 @@ public class TransitionPropertyChanged implements UndoableAction {
         for (Map.Entry<String, GuardElement> elem : newGuard.entrySet()) {
             g.add(elem.getKey(), elem.getValue().op, elem.getValue().value);
         }
+    }
 
+    public  boolean didPriorityChange(){
+        return newPriority!=oldPriority;
+    }
+
+    public Transition getTransition(){
+        return transition;
     }
 }

@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.HashMap;
@@ -24,17 +26,29 @@ public class TransitionProperty extends Activity implements TextWatcher {
 
     private Transition transition;
     private StateMachine machine;
+    private int priority;
+    private int maxPriority;
 
     private HashMap<String, SensorUI> uis = new HashMap<String, SensorUI>();
+
+    private TextView priorityField;
 
     private static Transition setupTransition;
     private static BeepRobot setupRobot;
     private static StateMachine setupMachine;
+    private static int setupPriority;
+    private static int setupMaxPriority;
 
-    public static void setupTransition(Transition t, BeepRobot r, StateMachine m) {
+    public static int getPriority() {
+        return setupPriority;
+    }
+
+    public static void setupTransition(Transition t, BeepRobot r, StateMachine m, int pri, int maxPri) {
         setupTransition = t;
         setupRobot = r;
         setupMachine = m;
+        setupPriority = pri;
+        setupMaxPriority = maxPri;
     }
 
     @Override
@@ -45,6 +59,11 @@ public class TransitionProperty extends Activity implements TextWatcher {
         transition = setupTransition;
         machine = setupMachine;
         BeepRobot robot = setupRobot;
+        priority = setupPriority;
+        maxPriority = setupMaxPriority;
+
+        priorityField = (TextView) findViewById(R.id.priority);
+        priorityField.setText(String.valueOf(priority));
 
         LinearLayout container = (LinearLayout) findViewById(R.id.sensorContainer);
 
@@ -74,8 +93,8 @@ public class TransitionProperty extends Activity implements TextWatcher {
         if (!newName.equals(transition.getLabel())) {
             if (machine.getTransition(newName) == null) {
                 transition.setLabel(newName);
-            }else{
-                Toast toast=Toast.makeText(this,R.string.nameAlreadyExists,Toast.LENGTH_LONG);
+            } else {
+                Toast toast = Toast.makeText(this, R.string.nameAlreadyExists, Toast.LENGTH_LONG);
                 toast.show();
                 return;
             }
@@ -88,6 +107,7 @@ public class TransitionProperty extends Activity implements TextWatcher {
                 ui.fillGuard(transition.getSmachableGuard());
             }
         }
+        setupPriority = priority;
         finish();
     }
 
@@ -108,5 +128,15 @@ public class TransitionProperty extends Activity implements TextWatcher {
             Toast toast = Toast.makeText(this, R.string.nameAlreadyExists, Toast.LENGTH_LONG);
             toast.show();
         }
+    }
+
+    public void increasePriority(View view) {
+        priority = Math.min(maxPriority, priority + 1);
+        priorityField.setText(String.valueOf(priority));
+    }
+
+    public void decreasePriority(View view) {
+        priority = Math.max(0, priority - 1);
+        priorityField.setText(String.valueOf(priority));
     }
 }

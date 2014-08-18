@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_luebeck.iti.smachapp.app.R;
+import de.uni_luebeck.iti.smachapp.app.TransitionProperty;
 import de.uni_luebeck.iti.smachapp.model.BezierPath;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.Transition;
@@ -84,7 +85,7 @@ public class TransitionController implements ExtendedGestureListener {
 
         findPickedTransition(point);
 
-        if(selected!=null){
+        if (selected != null) {
             dragAction = new DragTransition(selected);
         }
 
@@ -220,8 +221,7 @@ public class TransitionController implements ExtendedGestureListener {
             return true;
         }
         if (selected != null) {
-            propertyAction = new TransitionPropertyChanged(selected);
-            cont.showTransitionProperties(selected);
+            showProperties(selected);
             return true;
         }
         return false;
@@ -292,8 +292,7 @@ public class TransitionController implements ExtendedGestureListener {
 
             case R.id.context_menu_properties:
                 if (selectedTransition.size() == 1) {
-                    propertyAction = new TransitionPropertyChanged(selectedTransition.get(0));
-                    cont.showTransitionProperties(selectedTransition.get(0));
+                    showProperties(selectedTransition.get(0));
                 }
                 return true;
 
@@ -305,8 +304,16 @@ public class TransitionController implements ExtendedGestureListener {
     @Override
     public void resumed() {
         if (propertyAction != null) {
-            if (propertyAction.operationDone()) {
+            int newPriority= TransitionProperty.getPriority();
+            if (propertyAction.operationDone(newPriority)) {
                 cont.getModel().getUndoManager().newAction(propertyAction);
+
+                if(propertyAction.didPriorityChange()){
+                    Transition t=propertyAction.getTransition();
+                    List<Transition> list=t.getPreviousState().getTransitions();
+                    list.remove(t);
+                    list.add(newPriority,t);
+                }
             }
             propertyAction = null;
         }
@@ -319,8 +326,8 @@ public class TransitionController implements ExtendedGestureListener {
         cont.getView().postInvalidate();
     }
 
-    private void findPickedTransition(PointF point){
-        selected=null;
+    private void findPickedTransition(PointF point) {
+        selected = null;
         float minDistance = BezierPath.MIN_DISTANCE;
         for (Transition trans : cont.getModel().getStateMachine().getTransitions()) {
             List<PointF> transPoints = trans.getPath().getPoints();
@@ -338,6 +345,14 @@ public class TransitionController implements ExtendedGestureListener {
             }
         }
 
+    }
+
+    private void showProperties(Transition t) {
+        List<Transition> parent = t.getPreviousState().getTransitions();
+        int index = parent.indexOf(t);
+        propertyAction = new TransitionPropertyChanged(t, parent, index);
+
+        cont.showTransitionProperties(t, index, parent.size() - 1);
     }
 
 }
