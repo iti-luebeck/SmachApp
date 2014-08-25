@@ -98,10 +98,10 @@ public class SensorView extends ImageView implements DebugModelObserver {
         int size; //the image is square
 
         if (width > height) {
-            offsetX = (width - height)/2;
+            offsetX = (width - height) / 2;
             size = height;
         } else {
-            offsetY = (height - width)/2;
+            offsetY = (height - width) / 2;
             size = width;
         }
 
@@ -110,6 +110,11 @@ public class SensorView extends ImageView implements DebugModelObserver {
 
             for (int i = 0; i < ir.length; i++) {
                 canvas.drawText("IR" + i + ":" + Short.toString(ir[i]), irX[i] * size + offsetX, irY[i] * size + offsetY, paint);
+            }
+
+            int[] colors = model.getGroundColors();
+            for (int i = 0; i < colors.length; i++) {
+                canvas.drawText(Integer.toString(colors[i]), colorX[i] * size + offsetX, colorY[i] * size + offsetY, paint);
             }
         }
     }
