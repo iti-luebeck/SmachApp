@@ -124,10 +124,7 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
     }
 
     public void play() {
-        Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_SHORT);
-        toast.show();
         new StartTask(model.getEditor().getRobot(), model.getIp()).execute((Void)null);
-
     }
 
     public void stop(boolean disconnect){
@@ -147,7 +144,17 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
         @Override
         protected Void doInBackground(Void... connect) {
             try {
+                boolean showToast=false;
                 if(!robot.isConnected()) {
+                    showToast=true;
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+
                     robot.connect(address);
                     node=new RosNode(model,address);
                     node.startNode();
@@ -156,13 +163,15 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
                 robot.play();
                 model.setRunning(true);
                 activity.invalidateOptionsMenu();
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast toast = Toast.makeText(activity,R.string.connectionSuccess,Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                });
+                if(showToast) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast toast = Toast.makeText(activity, R.string.connectionSuccess, Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    });
+                }
             } catch (Exception ex) {
                 activity.runOnUiThread(new Runnable() {
                     @Override

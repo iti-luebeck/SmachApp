@@ -196,7 +196,7 @@ public class DebugActivity extends Activity implements DebugModelObserver {
         currentState.clear();
         lastTransition.clear();
         currentState.add(model.getCurrentState());
-        lastTransition.add(model.getLastTransition());
+        lastTransition.addAll(model.getLastTransitions());
         smView.postInvalidate();
     }
 }

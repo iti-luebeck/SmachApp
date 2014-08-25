@@ -147,19 +147,8 @@ public class BeepRobot {
             }
             if (!isRoscoreRunning()) {
                 startNewRoscore();
-                try {
-                    Thread.sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
             startBeepNode();
-
-            try {
-                Thread.sleep(8000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
             return true;
         } catch (Exception e) {

@@ -1,9 +1,6 @@
 package de.uni_luebeck.iti.smachapp.model;
 
-import android.util.Log;
-
 import org.apache.http.conn.util.InetAddressUtils;
-import org.ros.address.BindAddress;
 import org.ros.message.MessageListener;
 import org.ros.namespace.GraphName;
 import org.ros.node.AbstractNodeMain;

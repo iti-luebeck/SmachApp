@@ -12,7 +12,7 @@ public class DebugModel {
     private EditorModel model;
 
     private State currentState;
-    private Transition lastTransition=null;
+    private List<Transition> lastTransitions=new LinkedList<Transition>();
 
     private short[] ir = new short[8];
     private int[] groundColors = new int[3];
@@ -39,11 +39,13 @@ public class DebugModel {
     }
 
     public void updateCurrentState(String state) {
+        if(!state.equals(currentState.getName())) {
+            lastTransitions.clear();
+        }
         for(Transition t:currentState){
             if(t.getFollowerState().getName().equals(state)){
-                lastTransition=t;
+                lastTransitions.add(t);
                 currentState=t.getFollowerState();
-                break;
             }
         }
 
@@ -87,8 +89,8 @@ public class DebugModel {
         return currentState;
     }
 
-    public Transition getLastTransition(){
-        return lastTransition;
+    public List<Transition> getLastTransitions(){
+        return lastTransitions;
     }
 
     public short[] getIr() {
