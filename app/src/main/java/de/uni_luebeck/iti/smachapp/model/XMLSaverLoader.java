@@ -47,12 +47,19 @@ public class XMLSaverLoader {
     private static final String PROP_OPERATOR = "operator";
 
     public static File[] getAllSaves() {
-        return PATH.listFiles(new FilenameFilter() {
+        File[] res = PATH.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File file, String s) {
                 return s.endsWith(FILE_ENDING);
             }
         });
+
+        if (res == null) {
+            PATH.mkdirs();
+            res = new File[0];
+        }
+
+        return res;
     }
 
     public static boolean doesFileExist(String automatName) {
