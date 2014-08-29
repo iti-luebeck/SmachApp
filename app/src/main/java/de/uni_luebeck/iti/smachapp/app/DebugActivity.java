@@ -2,11 +2,13 @@ package de.uni_luebeck.iti.smachapp.app;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
@@ -44,6 +46,8 @@ public class DebugActivity extends Activity implements DebugModelObserver {
     private List<State> currentState = new ArrayList<State>(1);
     private List<Transition> lastTransition = new ArrayList<Transition>(1);
 
+    private AlertDialog dialog;
+
     public static void setup(EditorModel model) {
         setupModel = model;
     }
@@ -77,6 +81,11 @@ public class DebugActivity extends Activity implements DebugModelObserver {
         sensorView.setModel(model);
 
         controller.setView(smView);
+
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        builder.setView(View.inflate(this, R.layout.working_dialog, null));
+        builder.setCancelable(false);
+        dialog=builder.create();
 
         final Activity activity = this;
 
@@ -198,5 +207,13 @@ public class DebugActivity extends Activity implements DebugModelObserver {
         currentState.add(model.getCurrentState());
         lastTransition.addAll(model.getLastTransitions());
         smView.postInvalidate();
+    }
+
+    public void showWorkingDialog(){
+        dialog.show();
+    }
+
+    public void hideWorkingDialog(){
+        dialog.dismiss();
     }
 }

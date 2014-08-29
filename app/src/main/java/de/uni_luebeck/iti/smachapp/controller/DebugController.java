@@ -31,6 +31,9 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
 
     private RosNode node;
 
+    private boolean isStarting=false;
+    private boolean isStopping=false;
+
     public DebugController(DebugModel model, DebugActivity activity) {
         this.model = model;
         this.activity = activity;
@@ -124,10 +127,20 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
     }
 
     public void play() {
+        if(isStarting){
+            return;
+        }
+        isStarting=true;
+        activity.showWorkingDialog();
         new StartTask(model.getEditor().getRobot(), model.getIp()).execute((Void)null);
     }
 
     public void stop(boolean disconnect){
+        if(isStopping){
+            return;
+        }
+        isStopping=true;
+        activity.showWorkingDialog();
         new StopTask(model.getEditor().getRobot()).execute(disconnect);
     }
 
@@ -144,17 +157,7 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
         @Override
         protected Void doInBackground(Void... connect) {
             try {
-                boolean showToast=false;
                 if(!robot.isConnected()) {
-                    showToast=true;
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast toast = Toast.makeText(activity, R.string.connecting, Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    });
-
                     robot.connect(address);
                     node=new RosNode(model,address);
                     node.startNode();
@@ -163,15 +166,7 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
                 robot.play();
                 model.setRunning(true);
                 activity.invalidateOptionsMenu();
-                if(showToast) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast toast = Toast.makeText(activity, R.string.connectionSuccess, Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    });
-                }
+
             } catch (Exception ex) {
                 activity.runOnUiThread(new Runnable() {
                     @Override
@@ -182,6 +177,8 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
                 });
                 ex.printStackTrace();
             }
+            isStarting=false;
+            activity.hideWorkingDialog();
             return null;
         }
     }
@@ -210,7 +207,8 @@ public class DebugController implements GestureDetector.OnGestureListener, Scale
             }catch (Exception ex){
                 ex.printStackTrace();
             }
-
+            isStopping=false;
+            activity.hideWorkingDialog();
             return null;
         }
     }

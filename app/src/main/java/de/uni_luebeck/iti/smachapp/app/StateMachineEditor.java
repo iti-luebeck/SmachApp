@@ -259,14 +259,16 @@ public class StateMachineEditor extends Activity implements UndoListener {
         });
 
         final AlertDialog dia = builder.show();
-        text.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputMethodManager keyboard = (InputMethodManager)
-                        getSystemService(Context.INPUT_METHOD_SERVICE);
-                keyboard.showSoftInput(text, 0);
-            }
-        }, 200);
+        if(text.getText().toString().isEmpty()) {
+            text.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    InputMethodManager keyboard = (InputMethodManager)
+                            getSystemService(Context.INPUT_METHOD_SERVICE);
+                    keyboard.showSoftInput(text, 0);
+                }
+            }, 200);
+        }
 
         text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

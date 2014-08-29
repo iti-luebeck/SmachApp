@@ -62,5 +62,6 @@
     <string name="transition_property_increase_priority">+</string>
     <string name="transition_property_decrease_value">-</string>
     <string name="transition_property_priority">Priorität:</string>
+    <string name="working_dialog_text">Übertrage...</string>
 
 </resources>
