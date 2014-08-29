@@ -47,6 +47,7 @@ public class DebugActivity extends Activity implements DebugModelObserver {
     private List<Transition> lastTransition = new ArrayList<Transition>(1);
 
     private AlertDialog dialog;
+    private boolean isDestroyed=false;
 
     public static void setup(EditorModel model) {
         setupModel = model;
@@ -137,8 +138,17 @@ public class DebugActivity extends Activity implements DebugModelObserver {
         setContentView(group);
     }
 
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        hideWorkingDialog();
+    }
+
     @Override
     protected void onDestroy(){
+        hideWorkingDialog();
+        isDestroyed=true;
         super.onDestroy();
         System.out.println("Destroying");
         controller.stop(true);
@@ -210,10 +220,16 @@ public class DebugActivity extends Activity implements DebugModelObserver {
     }
 
     public void showWorkingDialog(){
-        dialog.show();
+        if(!isDestroyed) {
+            dialog.show();
+        }
     }
 
     public void hideWorkingDialog(){
-        dialog.dismiss();
+        try {
+            dialog.dismiss();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 }
