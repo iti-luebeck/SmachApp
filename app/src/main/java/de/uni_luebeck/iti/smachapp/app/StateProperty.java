@@ -84,9 +84,9 @@ public class StateProperty extends Activity implements TextWatcher {
 
     @Override
     public void onBackPressed() {
-        String newName = ((EditText) findViewById(R.id.stateName)).getText().toString();
+        String newName = ((EditText) findViewById(R.id.stateName)).getText().toString().trim();
 
-        if (!newName.equals(state.getName())) {
+        if (!newName.equals(state.getName()) && !newName.isEmpty()) {
             if (machine.getState(newName) == null) {
                 state.setName(newName);
             }else{
@@ -125,10 +125,15 @@ public class StateProperty extends Activity implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable editable) {
-        String name=editable.toString();
+        String name=editable.toString().trim();
 
         if(!name.equals(state.getName()) && machine.getState(name)!=null){
             Toast toast=Toast.makeText(this,R.string.nameAlreadyExists,Toast.LENGTH_LONG);
+            toast.show();
+        }
+
+        if(name.isEmpty()){
+            Toast toast=Toast.makeText(this,R.string.empty_name_in_property,Toast.LENGTH_LONG);
             toast.show();
         }
     }

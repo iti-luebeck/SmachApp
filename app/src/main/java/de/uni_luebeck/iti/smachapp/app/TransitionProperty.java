@@ -90,9 +90,9 @@ public class TransitionProperty extends Activity implements TextWatcher {
 
     @Override
     public void onBackPressed() {
-        String newName = ((EditText) findViewById(R.id.transitionName)).getText().toString();
+        String newName = ((EditText) findViewById(R.id.transitionName)).getText().toString().trim();
 
-        if (!newName.equals(transition.getLabel())) {
+        if (!newName.equals(transition.getLabel()) && !newName.isEmpty()) {
             if (machine.getTransition(newName) == null) {
                 transition.setLabel(newName);
             } else {
@@ -128,9 +128,14 @@ public class TransitionProperty extends Activity implements TextWatcher {
 
     @Override
     public void afterTextChanged(Editable editable) {
-        String name = editable.toString();
+        String name = editable.toString().trim();
         if (!name.equals(transition.getLabel()) && machine.getTransition(name) != null) {
             Toast toast = Toast.makeText(this, R.string.nameAlreadyExists, Toast.LENGTH_LONG);
+            toast.show();
+        }
+
+        if(name.isEmpty()){
+            Toast toast=Toast.makeText(this,R.string.empty_name_in_property,Toast.LENGTH_LONG);
             toast.show();
         }
     }

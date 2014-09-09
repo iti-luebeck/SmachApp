@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import de.uni_luebeck.iti.smachapp.model.EditorModel;
 import de.uni_luebeck.iti.smachapp.model.XMLSaverLoader;
@@ -37,6 +38,8 @@ public class MachineProperty extends Activity {
         if (!newName.isEmpty()) {
             updateMachineName(newName);
         } else {
+            Toast toast=Toast.makeText(this,R.string.empty_name_in_property,Toast.LENGTH_LONG);
+            toast.show();
             finish();
         }
     }

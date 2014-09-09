@@ -65,5 +65,6 @@
     <string name="working_dialog_text">Übertrage...</string>
     <string name="empty_name">Bitte geben Sie einen Namen ein.</string>
     <string name="enter_a_value">Geben Sie eine Nummer ein.</string>
+    <string name="empty_name_in_property">Wenn Sie den Namen frei lassen, so wird er nicht geändert.</string>
 
 </resources>
