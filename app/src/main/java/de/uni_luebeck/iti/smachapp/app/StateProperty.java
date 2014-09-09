@@ -4,9 +4,13 @@ package de.uni_luebeck.iti.smachapp.app;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.HashMap;
@@ -64,7 +68,11 @@ public class StateProperty extends Activity implements TextWatcher {
         }
 
         for (Action a : state.getActions()) {
-            uis.get(a.getActuatorName()).setToAction(a);
+            uis.get(a.getActuatorName()).setToAction(a,true);
+        }
+
+        for(Action a:state.getDisabledActions()){
+            uis.get(a.getActuatorName()).setToAction(a,false);
         }
 
         EditText text=(EditText)findViewById(R.id.stateName);
@@ -91,9 +99,14 @@ public class StateProperty extends Activity implements TextWatcher {
         List<Action> actions = state.getActions();
         actions.clear();
 
+        List<Action> disabledActions=state.getDisabledActions();
+        disabledActions.clear();
+
         for (ActuatorUI ui : uis.values()) {
             if (ui.isChecked()) {
                 actions.add(ui.createAction());
+            }else{
+                disabledActions.add(ui.createAction());
             }
         }
 

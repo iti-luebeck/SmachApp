@@ -14,6 +14,8 @@ public class Transition implements ISmachableTransition {
     private Guard guard;
     private BezierPath path;
 
+    private Guard disabledGuard = new Guard();
+
     public Transition(State from, State to, String name, BezierPath path) {
         this(from, to, name, path, new Guard());
     }
@@ -59,5 +61,9 @@ public class Transition implements ISmachableTransition {
 
     public void setFollowerState(State s) {
         next = s;
+    }
+
+    public Guard getDisabledGuard(){
+        return disabledGuard;
     }
 }

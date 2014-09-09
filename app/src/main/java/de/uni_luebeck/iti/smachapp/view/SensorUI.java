@@ -7,7 +7,7 @@ import de.uni_luebeck.iti.smachapp.model.Guard;
  */
 public interface SensorUI {
 
-    public abstract void setToGuard(Guard guard);
+    public abstract void setToGuard(Guard guard,boolean checked);
 
     public abstract void fillGuard(Guard guard);
 

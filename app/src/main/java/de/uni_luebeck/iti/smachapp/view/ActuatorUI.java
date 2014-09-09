@@ -7,7 +7,7 @@ import de.uni_luebeck.iti.smachapp.model.Action;
  */
 public interface ActuatorUI {
 
-    public abstract void setToAction(Action action);
+    public abstract void setToAction(Action action,boolean checked);
 
     public abstract Action createAction();
 

@@ -89,7 +89,16 @@ public class MainActivity extends Activity {
         });
     }
 
-    private void handlePositive(final String newName, final Intent intent) {
+    private void handlePositive(String name, final Intent intent) {
+
+        final String newName=name.trim();
+
+        if(newName.isEmpty()){
+            Toast toast=Toast.makeText(this, R.string.empty_name,Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+
         Context activity = this;
         if (XMLSaverLoader.doesFileExist(newName)) {
             AlertDialog.Builder build = new AlertDialog.Builder(activity);

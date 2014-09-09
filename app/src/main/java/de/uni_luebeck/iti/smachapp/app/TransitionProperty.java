@@ -71,14 +71,16 @@ public class TransitionProperty extends Activity implements TextWatcher {
             IntSlider slider = new IntSlider(this, sen);
             container.addView(slider);
             uis.put(sen.getName(), slider);
-            slider.setToGuard(transition.getSmachableGuard());
+            slider.setToGuard(transition.getSmachableGuard(),true);
+            slider.setToGuard(transition.getDisabledGuard(),false);
         }
 
         for (BeepColorSensor sen : robot.getColorSensors()) {
             ColorSelector sel = new ColorSelector(this, sen);
             container.addView(sel);
             uis.put(sen.getName(), sel);
-            sel.setToGuard(transition.getSmachableGuard());
+            sel.setToGuard(transition.getSmachableGuard(),true);
+            sel.setToGuard(transition.getDisabledGuard(),false);
         }
 
         EditText text = (EditText) findViewById(R.id.transitionName);
@@ -101,10 +103,13 @@ public class TransitionProperty extends Activity implements TextWatcher {
         }
 
         transition.getSmachableGuard().clear();
+        transition.getDisabledGuard().clear();
 
         for (SensorUI ui : uis.values()) {
             if (ui.isChecked()) {
                 ui.fillGuard(transition.getSmachableGuard());
+            }else{
+                ui.fillGuard(transition.getDisabledGuard());
             }
         }
         setupPriority = priority;

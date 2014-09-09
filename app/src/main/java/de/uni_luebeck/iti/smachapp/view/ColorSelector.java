@@ -65,12 +65,12 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
     }
 
     @Override
-    public void setToAction(Action action) {
+    public void setToAction(Action action,boolean checked) {
         if (!action.getActuatorName().equals(actuator.getName())) {
             throw new IllegalArgumentException("The action is not meant for this actuator.");
         }
 
-        check.setChecked(true);
+        check.setChecked(checked);
         color = action.getValue();
         button.setBackgroundColor(color);
         button.postInvalidate();
@@ -82,12 +82,12 @@ public class ColorSelector extends LinearLayout implements View.OnClickListener,
     }
 
     @Override
-    public void setToGuard(Guard guard) {
+    public void setToGuard(Guard guard,boolean checked) {
 
         List<String> names = guard.getSensorNames();
         for (int i = 0; i < names.size(); i++) {
             if (names.get(i).equals(sensor.getName())) {
-                check.setChecked(true);
+                check.setChecked(checked);
                 color = guard.getCompValues().get(i);
                 button.setBackgroundColor(color);
                 button.postInvalidate();

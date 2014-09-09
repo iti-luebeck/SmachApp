@@ -41,7 +41,7 @@
     <string name="automat">Automat:</string>
     <string name="hint_automatName">Name des Automaten</string>
     <string name="preference_key_showTransitionNames">showTransitionNames</string>
-    <string name="preference_title_showTransitionNames">Überagangsnamen Anzeigen</string>
+    <string name="preference_title_showTransitionNames">Übergangsnamen Anzeigen</string>
     <string name="preference_summary_showTransitionNames">Zeigt die Namen der Übergänge an, wenn aktiviert.</string>
     <string name="failed_to_load">Beim Laden ist ein fehler Aufgetreten.</string>
     <string name="pick_a_file">Wähle einen Automaten</string>
@@ -63,5 +63,7 @@
     <string name="transition_property_decrease_value">-</string>
     <string name="transition_property_priority">Priorität:</string>
     <string name="working_dialog_text">Übertrage...</string>
+    <string name="empty_name">Bitte geben Sie einen Namen ein.</string>
+    <string name="enter_a_value">Geben Sie eine Nummer ein.</string>
 
 </resources>

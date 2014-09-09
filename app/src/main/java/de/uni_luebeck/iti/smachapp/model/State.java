@@ -15,6 +15,7 @@ public class State implements ISmachableState, Iterable<Transition> {
     private boolean initialState;
     private LinkedList<Transition> transitions = new LinkedList<Transition>();
     private LinkedList<Action> actions = new LinkedList<Action>();
+    private LinkedList<Action> disabledActions=new LinkedList<Action>();
 
     private float x, y;
 
@@ -108,5 +109,9 @@ public class State implements ISmachableState, Iterable<Transition> {
 
     public void setInitialState(boolean init) {
         initialState = init;
+    }
+
+    public List<Action> getDisabledActions(){
+        return disabledActions;
     }
 }

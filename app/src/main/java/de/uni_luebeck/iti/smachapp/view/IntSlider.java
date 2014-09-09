@@ -1,8 +1,16 @@
 package de.uni_luebeck.iti.smachapp.view;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.text.InputType;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -10,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.Action;
 import de.uni_luebeck.iti.smachapp.model.BeepIRSensor;
 import de.uni_luebeck.iti.smachapp.model.BeepMotorActuator;
@@ -29,9 +38,83 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
     private Spinner spinner;
     private ArrayAdapter<String> adapter;
 
+    private Context context;
+
+    private class MyOnClickListener implements OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+            builder.setTitle(R.string.enter_a_value);
+            final EditText text = new EditText(context);
+            text.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
+            text.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            text.setText(disp.getText());
+            text.selectAll();
+            builder.setView(text);
+
+            builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    InputMethodManager keyboard = (InputMethodManager)
+                            context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    keyboard.hideSoftInputFromWindow(text.getWindowToken(), 0);
+                    handleOk(text.getText().toString());
+                }
+            });
+
+            builder.setNegativeButton(R.string.disrecard, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    InputMethodManager keyboard = (InputMethodManager)
+                            context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    keyboard.hideSoftInputFromWindow(text.getWindowToken(), 0);
+                }
+            });
+
+            final AlertDialog dia = builder.show();
+
+            text.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    InputMethodManager keyboard = (InputMethodManager)
+                            context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    keyboard.showSoftInput(text, 0);
+                }
+            }, 200);
+
+
+            text.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                    dia.dismiss();
+                    InputMethodManager keyboard = (InputMethodManager)
+                            context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    keyboard.hideSoftInputFromWindow(text.getWindowToken(), 0);
+                    handleOk(text.getText().toString());
+                    return true;
+                }
+            });
+        }
+
+        private void handleOk(String text) {
+            if (text.charAt(0) == '+') {
+                text = text.substring(1);
+            }
+            if (actuator != null) {
+                slider.setProgress(Integer.parseInt(text) - actuator.getMin());
+            } else {
+                slider.setProgress(Integer.parseInt(text) - sensor.getMin());
+            }
+
+        }
+    }
+
 
     public IntSlider(Context context, BeepMotorActuator actuator) {
         super(context);
+        this.context = context;
         this.actuator = actuator;
         sensor = null;
         spinner = null;
@@ -46,6 +129,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         disp = new TextView(context);
         param = new LinearLayout.LayoutParams(100, LinearLayout.LayoutParams.WRAP_CONTENT);
         disp.setLayoutParams(param);
+        disp.setOnClickListener(new MyOnClickListener());
 
         slider = new SeekBar(context);
         slider.setMax(actuator.getMax() - actuator.getMin());
@@ -71,6 +155,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
     public IntSlider(Context context, BeepIRSensor sensor) {
         super(context);
         this.sensor = sensor;
+        this.context = context;
         actuator = null;
 
         LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -82,6 +167,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         disp = new TextView(context);
         param = new LinearLayout.LayoutParams(100, LinearLayout.LayoutParams.WRAP_CONTENT);
         disp.setLayoutParams(param);
+        disp.setOnClickListener(new MyOnClickListener());
 
         slider = new SeekBar(context);
         slider.setMax(sensor.getMax() - sensor.getMin());
@@ -120,13 +206,13 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
 
 
     @Override
-    public void setToAction(Action action) {
+    public void setToAction(Action action,boolean checked) {
         if (!action.getActuatorName().equals(actuator.getName())) {
             throw new IllegalArgumentException("The action is not for this actuator.");
         }
 
         slider.setProgress(action.getValue() - actuator.getMin());
-        check.setChecked(true);
+        check.setChecked(checked);
     }
 
     @Override
@@ -134,12 +220,12 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         return new Action(actuator.getName(), slider.getProgress() + actuator.getMin());
     }
 
-    public void setToGuard(Guard guard) {
+    public void setToGuard(Guard guard,boolean checked) {
 
         List<String> names = guard.getSensorNames();
         for (int i = 0; i < names.size(); i++) {
             if (names.get(i).equals(sensor.getName())) {
-                check.setChecked(true);
+                check.setChecked(checked);
                 slider.setProgress(guard.getCompValues().get(i) - sensor.getMin());
                 spinner.setSelection(adapter.getPosition(guard.getOperators().get(i)));
             }

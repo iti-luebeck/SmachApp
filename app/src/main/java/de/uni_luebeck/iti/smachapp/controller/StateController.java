@@ -183,6 +183,16 @@ public class StateController implements ExtendedGestureListener {
             }
             dragged = null;
             cont.getView().postInvalidate();
+        }else{
+            State s = new State(cont.getModel().getNextStateName(), point.x, point.y);
+            AddState action = new AddState(s, cont.getModel().getStateMachine());
+            action.redo();
+            cont.getModel().getUndoManager().newAction(action);
+            dragged=s;
+            isActionModeActive=true;
+            selected.add(s);
+            cont.showContextMenu();
+            cont.getView().postInvalidate();
         }
     }
 
