@@ -99,13 +99,16 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         }
 
         private void handleOk(String text) {
-            if (text.charAt(0) == '+') {
+            if (!text.isEmpty() && text.charAt(0) == '+') {
                 text = text.substring(1);
             }
-            if (actuator != null) {
-                slider.setProgress(Integer.parseInt(text) - actuator.getMin());
-            } else {
-                slider.setProgress(Integer.parseInt(text) - sensor.getMin());
+            try {
+                if (actuator != null) {
+                    slider.setProgress(Integer.parseInt(text) - actuator.getMin());
+                } else {
+                    slider.setProgress(Integer.parseInt(text) - sensor.getMin());
+                }
+            } catch (IllegalArgumentException ex) {
             }
 
         }
@@ -206,7 +209,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
 
 
     @Override
-    public void setToAction(Action action,boolean checked) {
+    public void setToAction(Action action, boolean checked) {
         if (!action.getActuatorName().equals(actuator.getName())) {
             throw new IllegalArgumentException("The action is not for this actuator.");
         }
@@ -220,7 +223,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         return new Action(actuator.getName(), slider.getProgress() + actuator.getMin());
     }
 
-    public void setToGuard(Guard guard,boolean checked) {
+    public void setToGuard(Guard guard, boolean checked) {
 
         List<String> names = guard.getSensorNames();
         for (int i = 0; i < names.size(); i++) {

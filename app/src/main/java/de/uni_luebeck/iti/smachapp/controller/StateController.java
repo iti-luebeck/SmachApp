@@ -91,8 +91,10 @@ public class StateController implements ExtendedGestureListener {
 
     @Override
     public void onShowPress(MotionEvent motionEvent) {
-        selected.add(dragged);
-        cont.getView().postInvalidate();
+        if(!isActionModeActive) {
+            selected.add(dragged);
+            cont.getView().postInvalidate();
+        }
     }
 
     @Override
@@ -104,25 +106,15 @@ public class StateController implements ExtendedGestureListener {
 
         if (isActionModeActive) {
 
-            for (Iterator<State> iter = selected.iterator(); iter.hasNext(); ) {
-                State s = iter.next();
-                cont.getView().getStateRect(s, rect);
-                if (rect.contains(point.x, point.y)) {
-                    iter.remove();
-                    isActionModeActive = cont.updateSelection(selected.size());
-                    cont.getView().postInvalidate();
-                    return true;
+            if(dragged!=null){
+                if(selected.contains(dragged)){
+                    selected.remove(dragged);
+                }else{
+                    selected.add(dragged);
                 }
-            }
 
-            for (State s : cont.getModel().getStateMachine()) {
-                cont.getView().getStateRect(s, rect);
-                if (rect.contains(point.x, point.y)) {
-                    selected.add(s);
-                    isActionModeActive = cont.updateSelection(selected.size());
-                    cont.getView().postInvalidate();
-                    return true;
-                }
+                isActionModeActive=cont.updateSelection(selected.size());
+                cont.getView().postInvalidate();
             }
 
             return true;
@@ -175,6 +167,26 @@ public class StateController implements ExtendedGestureListener {
 
     @Override
     public void onLongPress(MotionEvent motionEvent) {
+
+        point.x = motionEvent.getX();
+        point.y = motionEvent.getY();
+        cont.getView().translatePoint(point);
+
+        if(isActionModeActive){
+
+            if(dragged!=null){
+                if(selected.contains(dragged)){
+                    selected.remove(dragged);
+                }else{
+                    selected.add(dragged);
+                }
+
+                isActionModeActive=cont.updateSelection(selected.size());
+                cont.getView().postInvalidate();
+            }
+
+            return;
+        }
         if (dragged != null) {
             cont.showContextMenu();
             isActionModeActive = true;
@@ -190,6 +202,7 @@ public class StateController implements ExtendedGestureListener {
             cont.getModel().getUndoManager().newAction(action);
             dragged=s;
             isActionModeActive=true;
+            selected.clear();
             selected.add(s);
             cont.showContextMenu();
             cont.getView().postInvalidate();
