@@ -1,8 +1,12 @@
 package de.uni_luebeck.iti.smachapp.model.undo;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import java.util.Hashtable;
 import java.util.Map;
 
+import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.Action;
 import de.uni_luebeck.iti.smachapp.model.State;
 import de.uni_luebeck.iti.smachapp.model.StateMachine;
@@ -14,6 +18,7 @@ public class StatePropertyChanged implements UndoableAction {
 
     private State state;
     private StateMachine machine;
+    private Context context;
 
     private String oldName;
     private String newName;
@@ -21,7 +26,8 @@ public class StatePropertyChanged implements UndoableAction {
     private Hashtable<String, Integer> oldActions = new Hashtable<String, Integer>();
     private Hashtable<String, Integer> newActions = new Hashtable<String, Integer>();
 
-    public StatePropertyChanged(State state, StateMachine machine) {
+    public StatePropertyChanged(State state, StateMachine machine,Context context) {
+        this.context=context;
         this.state = state;
         this.machine = machine;
         oldName = state.getName();
@@ -53,6 +59,7 @@ public class StatePropertyChanged implements UndoableAction {
             state.addAction(new Action(entry.getKey(), entry.getValue()));
         }
         machine.fixTransitionEnds(state);
+        Toast.makeText(context, R.string.undid_state_properties,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -63,5 +70,10 @@ public class StatePropertyChanged implements UndoableAction {
             state.addAction(new Action(entry.getKey(), entry.getValue()));
         }
         machine.fixTransitionEnds(state);
+        Toast.makeText(context,R.string.redid_state_properties,Toast.LENGTH_SHORT).show();;
+    }
+
+    public State getState() {
+        return state;
     }
 }

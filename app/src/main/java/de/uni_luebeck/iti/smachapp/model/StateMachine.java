@@ -118,6 +118,10 @@ public class StateMachine implements Iterable<State> {
     }
 
     public void fixTransitionEnds(State s) {
+
+        if(s==null){
+            return;
+        }
         List<Transition> trans = getIncomingTransitions(s);
 
         RectF rect = new RectF();

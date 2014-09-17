@@ -1,5 +1,6 @@
 package de.uni_luebeck.iti.smachapp.controller;
 
+import android.content.Context;
 import android.view.ActionMode;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -36,6 +37,8 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
 
     private boolean isMulitTouch = false;
     private ActionMode actionMode = null;
+
+    private boolean propertiesOpening=false;
 
     public StateMachineEditorController(EditorModel model, StateMachineView view, StateMachineEditor activity) {
         this.model = model;
@@ -236,14 +239,25 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
     }
 
     public void showStateProperties(State s) {
+        if(propertiesOpening){
+            return;
+        }
+
+        propertiesOpening=true;
         activity.showStateProperties(s);
     }
 
     public void showTransitionProperties(Transition t, int priority, int maxPriority) {
+        if(propertiesOpening){
+            return;
+        }
+
+        propertiesOpening=true;
         activity.showTransitionProperites(t, priority, maxPriority);
     }
 
     public void resumed() {
+        propertiesOpening=false;
         subController.resumed();
     }
 
@@ -260,5 +274,9 @@ public class StateMachineEditorController implements View.OnTouchListener, Scale
         XMLSaverLoader.PATH.mkdirs();
         SmachAutomat automat = new SmachAutomat(model.getStateMachine().getStates(), model.getRobot().getSensors(), model.getRobot().getActuators(), "zusmoro_state_machine");
         automat.saveToFile(model.getPythonFile());
+    }
+
+    public Context getContext(){
+        return activity;
     }
 }

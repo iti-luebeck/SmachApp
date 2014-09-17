@@ -121,7 +121,7 @@ public class StateController implements ExtendedGestureListener {
         }
 
         if (dragged != null) {
-            propertyChanged = new StatePropertyChanged(dragged, cont.getModel().getStateMachine());
+            propertyChanged = new StatePropertyChanged(dragged, cont.getModel().getStateMachine(),cont.getContext());
             cont.showStateProperties(dragged);
             return true;
         }
@@ -238,7 +238,7 @@ public class StateController implements ExtendedGestureListener {
 
             case R.id.context_menu_properties:
                 if (selected.size() == 1) {
-                    propertyChanged = new StatePropertyChanged(selected.get(0), cont.getModel().getStateMachine());
+                    propertyChanged = new StatePropertyChanged(selected.get(0), cont.getModel().getStateMachine(),cont.getContext());
                     cont.showStateProperties(selected.get(0));
                 }
                 return true;
@@ -275,7 +275,9 @@ public class StateController implements ExtendedGestureListener {
 
             if (propertyChanged.operationComplete()) {
                 cont.getModel().getUndoManager().newAction(propertyChanged);
-                cont.getModel().getStateMachine().fixTransitionEnds(dragged);
+                cont.getModel().getStateMachine().fixTransitionEnds(propertyChanged.getState());
+
+                Toast.makeText(cont.getContext(),R.string.changes_saved,Toast.LENGTH_SHORT).show();
             }
 
             dragged = null;

@@ -314,6 +314,8 @@ public class TransitionController implements ExtendedGestureListener {
                     list.remove(t);
                     list.add(newPriority,t);
                 }
+
+                Toast.makeText(cont.getContext(),R.string.changes_saved,Toast.LENGTH_SHORT).show();
             }
             propertyAction = null;
         }
@@ -350,7 +352,7 @@ public class TransitionController implements ExtendedGestureListener {
     private void showProperties(Transition t) {
         List<Transition> parent = t.getPreviousState().getTransitions();
         int index = parent.indexOf(t);
-        propertyAction = new TransitionPropertyChanged(t, parent, index);
+        propertyAction = new TransitionPropertyChanged(t, parent, index,cont.getContext());
 
         cont.showTransitionProperties(t, index, parent.size() - 1);
     }

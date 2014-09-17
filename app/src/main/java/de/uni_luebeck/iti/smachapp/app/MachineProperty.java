@@ -85,5 +85,6 @@ public class MachineProperty extends Activity {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        Toast.makeText(this,R.string.changes_saved,Toast.LENGTH_SHORT).show();
     }
 }

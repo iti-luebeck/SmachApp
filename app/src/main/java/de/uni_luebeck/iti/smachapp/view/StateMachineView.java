@@ -10,6 +10,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.View;
@@ -33,7 +34,11 @@ public class StateMachineView extends View {
     private static final float STATE_OVAL_OFFSET = 25f;
     private static final float DEBUG_POINT_SIZE = 4f;
 
-    private static Rect helperRect = new Rect();
+    private static float OLD_TRANSLATION_X;
+    private static float OLD_TRANSLATION_Y;
+    private static float OLD_SCALE;
+
+    private Rect helperRect = new Rect();
 
     private EditorModel model = null;
 
@@ -303,5 +308,21 @@ public class StateMachineView extends View {
         arrowHead.lineTo(dir.x + first.x, dir.y + first.y);
         arrowHead.lineTo(dir.x + second.x, dir.y + second.y);
         arrowHead.close();
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState(){
+        OLD_TRANSLATION_X=translationX;
+        OLD_TRANSLATION_Y=translationY;
+        OLD_SCALE=scale;
+        return super.onSaveInstanceState();
+    }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable par){
+        super.onRestoreInstanceState(par);
+        translationX=OLD_TRANSLATION_X;
+        translationY=OLD_TRANSLATION_Y;
+        scale=OLD_SCALE;
     }
 }

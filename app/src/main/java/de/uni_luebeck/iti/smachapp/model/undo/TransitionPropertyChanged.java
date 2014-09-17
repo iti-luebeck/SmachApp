@@ -1,9 +1,13 @@
 package de.uni_luebeck.iti.smachapp.model.undo;
 
+import android.content.Context;
+import android.widget.Toast;
+
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import de.uni_luebeck.iti.smachapp.app.R;
 import de.uni_luebeck.iti.smachapp.model.Guard;
 import de.uni_luebeck.iti.smachapp.model.Transition;
 
@@ -34,6 +38,8 @@ public class TransitionPropertyChanged implements UndoableAction {
 
     }
 
+    private Context context;
+
     private Transition transition;
     private List<Transition> parentList;
     private int oldPriority;
@@ -45,7 +51,8 @@ public class TransitionPropertyChanged implements UndoableAction {
     private Hashtable<String, GuardElement> oldGuard = new Hashtable<String, GuardElement>();
     private Hashtable<String, GuardElement> newGuard = new Hashtable<String, GuardElement>();
 
-    public TransitionPropertyChanged(Transition transition, List<Transition> parent, int priority) {
+    public TransitionPropertyChanged(Transition transition, List<Transition> parent, int priority,Context context) {
+        this.context=context;
         this.transition = transition;
         parentList = parent;
         oldPriority = priority;
@@ -90,6 +97,8 @@ public class TransitionPropertyChanged implements UndoableAction {
         for (Map.Entry<String, GuardElement> elem : oldGuard.entrySet()) {
             g.add(elem.getKey(), elem.getValue().op, elem.getValue().value);
         }
+
+        Toast.makeText(context, R.string.undid_transition_properties,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -105,6 +114,8 @@ public class TransitionPropertyChanged implements UndoableAction {
         for (Map.Entry<String, GuardElement> elem : newGuard.entrySet()) {
             g.add(elem.getKey(), elem.getValue().op, elem.getValue().value);
         }
+
+        Toast.makeText(context,R.string.redid_transition_properties,Toast.LENGTH_SHORT).show();
     }
 
     public  boolean didPriorityChange(){

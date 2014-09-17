@@ -66,5 +66,10 @@
     <string name="empty_name">Bitte geben Sie einen Namen ein.</string>
     <string name="enter_a_value">Geben Sie eine Nummer ein.</string>
     <string name="empty_name_in_property">Wenn Sie den Namen frei lassen, so wird er nicht geändert.</string>
+    <string name="changes_saved">Änderungen wurden übernommen</string>
+    <string name="undid_state_properties">Zustandseigenschaftenänderung rückgängig gemacht</string>
+    <string name="redid_state_properties">Zustandseigenschaftenänderung wiederhergestellt</string>
+    <string name="undid_transition_properties">Transitionseigenschaftenänderung rückgängig gemacht</string>
+    <string name="redid_transition_properties">Transitionseigenschaftenänderung wiederhergestellt</string>
 
 </resources>
