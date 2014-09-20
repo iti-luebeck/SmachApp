@@ -190,7 +190,7 @@ public class IntSlider extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         spinner = new Spinner(context);
         spinner.setAdapter(adapter);
         spinner.setSelection(0);
-        param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         spinner.setLayoutParams(param);
 
         if (0 <= sensor.getMax() && 0 >= sensor.getMin()) {

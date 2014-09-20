@@ -71,5 +71,7 @@
     <string name="redid_state_properties">Zustandseigenschaftenänderung wiederhergestellt</string>
     <string name="undid_transition_properties">Transitionseigenschaftenänderung rückgängig gemacht</string>
     <string name="redid_transition_properties">Transitionseigenschaftenänderung wiederhergestellt</string>
+    <string name="max_priority_reached">Maximale Priorität erreicht</string>
+    <string name="min_priority_reached">Minimale Priorität erreicht</string>
 
 </resources>
