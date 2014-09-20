@@ -145,7 +145,7 @@ public class TransitionProperty extends Activity implements TextWatcher {
 
         if(priority>maxPriority){
             priority=maxPriority;
-            Toast.makeText(this,R.string.max_priority_reached,Toast.LENGTH_LONG).show();
+            Toast.makeText(this,R.string.max_priority_reached,Toast.LENGTH_SHORT).show();
         }
 
         priorityField.setText(String.valueOf(priority));
@@ -156,7 +156,7 @@ public class TransitionProperty extends Activity implements TextWatcher {
 
         if(priority<0){
             priority=0;
-            Toast.makeText(this,R.string.min_priority_reached,Toast.LENGTH_LONG).show();
+            Toast.makeText(this,R.string.min_priority_reached,Toast.LENGTH_SHORT).show();
         }
 
         priorityField.setText(String.valueOf(priority));
